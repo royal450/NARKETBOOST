@@ -1,0 +1,166 @@
+
+import type { Express } from "express";
+import { createServer, type Server } from "http";
+import { storage } from "./storage";
+
+export async function registerRoutes(app: Express): Promise<Server> {
+  // Course Management APIs
+  app.get("/api/courses", async (req, res) => {
+    try {
+      // Get only active courses for dashboard
+      const courses = await storage.getCourses();
+      const activeCourses = courses.filter(course => course.status === 'active');
+      res.json(activeCourses);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch courses" });
+    }
+  });
+
+  app.post("/api/courses", async (req, res) => {
+    try {
+      const courseData = {
+        ...req.body,
+        status: 'pending_review',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      
+      const course = await storage.createCourse(courseData);
+      res.json(course);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create course" });
+    }
+  });
+
+  // User Course Management
+  app.get("/api/users/:userId/courses", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const courses = await storage.getUserCourses(userId);
+      res.json(courses);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch user courses" });
+    }
+  });
+
+  // Course Approval/Rejection
+  app.put("/api/courses/:courseId/approve", async (req, res) => {
+    try {
+      const { courseId } = req.params;
+      const updatedCourse = await storage.updateCourse(courseId, {
+        status: 'active',
+        approvedAt: new Date().toISOString(),
+        approvedBy: 'admin'
+      });
+      res.json(updatedCourse);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to approve course" });
+    }
+  });
+
+  app.put("/api/courses/:courseId/reject", async (req, res) => {
+    try {
+      const { courseId } = req.params;
+      const { reason } = req.body;
+      
+      const updatedCourse = await storage.updateCourse(courseId, {
+        status: 'rejected',
+        rejectedAt: new Date().toISOString(),
+        rejectedBy: 'admin',
+        rejectionReason: reason
+      });
+      res.json(updatedCourse);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to reject course" });
+    }
+  });
+
+  // Referral System APIs
+  app.post("/api/referrals/track", async (req, res) => {
+    try {
+      const { referralCode, newUserId } = req.body;
+      
+      // Find referrer user
+      const referrer = await storage.getUserByReferralCode(referralCode);
+      if (!referrer) {
+        return res.status(404).json({ error: "Invalid referral code" });
+      }
+
+      // Track referral
+      await storage.trackReferral(referrer.id, newUserId);
+      
+      res.json({ success: true, referrer: referrer.id });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to track referral" });
+    }
+  });
+
+  app.post("/api/referrals/commission", async (req, res) => {
+    try {
+      const { purchaseAmount, buyerId } = req.body;
+      
+      // Find who referred this buyer
+      const referral = await storage.getReferralByBuyer(buyerId);
+      if (!referral) {
+        return res.json({ success: true, commission: 0 });
+      }
+
+      // Calculate commission (10% of purchase)
+      const commission = purchaseAmount * 0.1;
+      
+      // Update referrer's wallet
+      await storage.updateUserWallet(referral.referrerId, commission);
+      
+      res.json({ success: true, commission });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to process commission" });
+    }
+  });
+
+  // Payment Verification
+  app.post("/api/payments/verify", async (req, res) => {
+    try {
+      const { courseId, userId, amount, paymentMethod, transactionId } = req.body;
+      
+      // Create payment record
+      const payment = await storage.createPayment({
+        courseId,
+        userId,
+        amount,
+        paymentMethod,
+        transactionId,
+        status: 'pending',
+        createdAt: new Date().toISOString()
+      });
+
+      res.json(payment);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to verify payment" });
+    }
+  });
+
+  // Admin Stats
+  app.get("/api/admin/stats", async (req, res) => {
+    try {
+      const stats = await storage.getAdminStats();
+      res.json(stats);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch admin stats" });
+    }
+  });
+
+  // Dashboard filtering by status
+  app.get("/api/dashboard/courses", async (req, res) => {
+    try {
+      const courses = await storage.getCourses();
+      // Only return active courses for dashboard
+      const activeCourses = courses.filter(course => course.status === 'active');
+      res.json(activeCourses);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch dashboard courses" });
+    }
+  });
+
+  const httpServer = createServer(app);
+  return httpServer;
+}
