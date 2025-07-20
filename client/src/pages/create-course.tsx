@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Upload, BookOpen, DollarSign, Info, AlertTriangle } from "lucide-react";
 import { useLocation } from "wouter";
 
-export default function CreateCourse() {
+export default function ListChannel() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -24,7 +24,7 @@ export default function CreateCourse() {
       <div className="min-h-screen bg-gradient-to-br from-purple-600 to-blue-700 flex items-center justify-center">
         <div className="text-center text-white">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-          <p>Please login to create a course...</p>
+          <p>Please login to list your channel...</p>
         </div>
       </div>
     );
@@ -34,45 +34,40 @@ export default function CreateCourse() {
     description: "",
     price: "",
     fakePrice: "",
+    platform: "",
     category: "",
     thumbnail: "",
-    courseLink: "",
-    duration: "",
-    level: "beginner",
-    language: "Hindi",
+    channelLink: "",
+    followerCount: "",
+    engagementRate: "",
+    niche: "lifestyle",
+    monetization: "yes",
     tags: "",
-    requirements: "",
-    whatYouLearn: "",
-    courseContent: "",
+    targetAudience: "",
+    contentType: "",
+    analytics: "",
   });
 
+  const platforms = [
+    { id: "youtube", label: "YouTube Channel", image: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=400&h=300&fit=crop" },
+    { id: "instagram", label: "Instagram Channel", image: "https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?w=400&h=300&fit=crop" },
+    { id: "tiktok", label: "TikTok Channel", image: "https://images.unsplash.com/photo-1611162618071-b39a2ec055fb?w=400&h=300&fit=crop" },
+    { id: "twitter", label: "Twitter/X Channel", image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=300&fit=crop" },
+    { id: "facebook", label: "Facebook Page", image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=300&fit=crop" },
+    { id: "linkedin", label: "LinkedIn Page", image: "https://images.unsplash.com/photo-1493612276216-ee3925520721?w=400&h=300&fit=crop" },
+    { id: "telegram", label: "Telegram Channel", image: "https://images.unsplash.com/photo-1611162617213-7d7a39e9b377?w=400&h=300&fit=crop" },
+    { id: "discord", label: "Discord Server", image: "https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?w=400&h=300&fit=crop" }
+  ];
+
   const categories = [
-    { id: "youtube-growth", label: "YouTube Growth", image: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=400&h=300&fit=crop" },
-    { id: "instagram-growth", label: "Instagram Growth", image: "https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?w=400&h=300&fit=crop" },
-    { id: "facebook-marketing", label: "Facebook Marketing", image: "https://images.unsplash.com/photo-1611162618071-b39a2ec055fb?w=400&h=300&fit=crop" },
-    { id: "digital-marketing", label: "Digital Marketing", image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=300&fit=crop" },
-    { id: "affiliate-marketing", label: "Affiliate Marketing", image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=300&fit=crop" },
-    { id: "content-creation", label: "Content Creation", image: "https://images.unsplash.com/photo-1493612276216-ee3925520721?w=400&h=300&fit=crop" },
-    { id: "social-media", label: "Social Media Marketing", image: "https://images.unsplash.com/photo-1611162617213-7d7a39e9b377?w=400&h=300&fit=crop" },
-    { id: "seo", label: "SEO Optimization", image: "https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?w=400&h=300&fit=crop" },
-    { id: "web-development", label: "Web Development", image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=300&fit=crop" },
-    { id: "graphic-design", label: "Graphic Design", image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&h=300&fit=crop" },
-    { id: "video-editing", label: "Video Editing", image: "https://images.unsplash.com/photo-1536240478700-b869070f9279?w=400&h=300&fit=crop" },
-    { id: "photography", label: "Photography", image: "https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=400&h=300&fit=crop" },
-    { id: "business", label: "Business & Entrepreneurship", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop" },
-    { id: "finance", label: "Finance & Investment", image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=300&fit=crop" },
-    { id: "health-fitness", label: "Health & Fitness", image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop" },
-    { id: "lifestyle", label: "Lifestyle", image: "https://images.unsplash.com/photo-1544027993-37dbfe43562a?w=400&h=300&fit=crop" },
-    { id: "technology", label: "Technology", image: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=300&fit=crop" },
-    { id: "education", label: "Education & Teaching", image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400&h=300&fit=crop" },
-    { id: "language", label: "Language Learning", image: "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=400&h=300&fit=crop" },
+    { id: "tech", label: "Tech & Programming", image: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=300&fit=crop" },
+    { id: "business", label: "Business & Finance", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop" },
+    { id: "creative", label: "Creative & Design", image: "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=400&h=300&fit=crop" },
+    { id: "marketing", label: "Marketing & Sales", image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=300&fit=crop" },
+    { id: "lifestyle", label: "Lifestyle & Wellness", image: "https://images.unsplash.com/photo-1544027993-37dbfe43562a?w=400&h=300&fit=crop" },
+    { id: "entertainment", label: "Entertainment & Gaming", image: "https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?w=400&h=300&fit=crop" },
     { id: "music", label: "Music & Audio", image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop" },
-    { id: "art", label: "Art & Design", image: "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=400&h=300&fit=crop" },
-    { id: "cooking", label: "Cooking & Food", image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=300&fit=crop" },
-    { id: "travel", label: "Travel & Culture", image: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400&h=300&fit=crop" },
-    { id: "gaming", label: "Gaming & Entertainment", image: "https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?w=400&h=300&fit=crop" },
-    { id: "productivity", label: "Productivity & Organization", image: "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=400&h=300&fit=crop" },
-    { id: "personal-development", label: "Personal Development", image: "https://images.unsplash.com/photo-1499728603263-13726abce5b1?w=400&h=300&fit=crop" },
+    { id: "education", label: "Education & Learning", image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400&h=300&fit=crop" },
     { id: "parenting", label: "Parenting & Family", image: "https://images.unsplash.com/photo-1511895426328-dc8714191300?w=400&h=300&fit=crop" },
     { id: "pets", label: "Pets & Animals", image: "https://images.unsplash.com/photo-1425082661705-1834bfd09dca?w=400&h=300&fit=crop" },
     { id: "sports", label: "Sports & Recreation", image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop" },

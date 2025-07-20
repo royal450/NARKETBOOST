@@ -38,22 +38,22 @@ export default function Dashboard() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const { courses, loading } = useCourses();
-  const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
+  const [filteredChannels, setFilteredChannels] = useState<Course[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
+  const [selectedChannel, setSelectedChannel] = useState<Course | null>(null);
   const [userInteractions, setUserInteractions] = useState<{[key: string]: number}>({});
-  const [hoveredCourse, setHoveredCourse] = useState<string | null>(null);
+  const [hoveredChannel, setHoveredChannel] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState<string>("all");
-  const [shuffledCourses, setShuffledCourses] = useState<Course[]>([]);
+  const [shuffledChannels, setShuffledChannels] = useState<Course[]>([]);
 
   const categories = [
-    { id: "all", label: "All Courses", icon: Target, color: "from-purple-500 to-pink-500" },
-    { id: "YouTube Growth", label: "YouTube", icon: Youtube, color: "from-red-500 to-orange-500" },
-    { id: "Instagram Growth", label: "Instagram", icon: Instagram, color: "from-pink-500 to-purple-500" },
-    { id: "Marketing", label: "Marketing", icon: Megaphone, color: "from-blue-500 to-cyan-500" },
-    { id: "Self Respect", label: "Self Respect", icon: Heart, color: "from-green-500 to-emerald-500" },
-    { id: "Love", label: "Love", icon: Users, color: "from-red-500 to-pink-500" },
-    { id: "ChatGPT Expert", label: "AI Expert", icon: Bot, color: "from-violet-500 to-purple-500" },
+    { id: "all", label: "All Channels", icon: Target, color: "from-purple-500 to-pink-500" },
+    { id: "YouTube Channels", label: "YouTube", icon: Youtube, color: "from-red-500 to-orange-500" },
+    { id: "Instagram Channels", label: "Instagram", icon: Instagram, color: "from-pink-500 to-purple-500" },
+    { id: "Tech Channels", label: "Tech", icon: Megaphone, color: "from-blue-500 to-cyan-500" },
+    { id: "Business Channels", label: "Business", icon: Heart, color: "from-green-500 to-emerald-500" },
+    { id: "Creative Channels", label: "Creative", icon: Users, color: "from-red-500 to-pink-500" },
+    { id: "Marketing Channels", label: "Marketing", icon: Bot, color: "from-violet-500 to-purple-500" },
   ];
 
   // Fisher-Yates shuffle algorithm
@@ -67,11 +67,11 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    // Update filtered courses when courses change
+    // Update filtered channels when courses change
     if (courses.length > 0) {
       const shuffled = shuffleArray(courses);
-      setShuffledCourses(shuffled);
-      setFilteredCourses(shuffled);
+      setShuffledChannels(shuffled);
+      setFilteredChannels(shuffled);
     }
   }, [courses]);
 

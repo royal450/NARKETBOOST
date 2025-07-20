@@ -11,11 +11,11 @@ export function Footer() {
               <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
                 <GraduationCap className="text-white text-xl" />
               </div>
-              <span className="ml-3 text-2xl font-bold">RoyalDev</span>
+              <span className="ml-3 text-2xl font-bold">ChannelMarket</span>
             </div>
             <p className="text-gray-400 mb-6 max-w-md">
-              Empowering learners worldwide with premium courses and expert knowledge. 
-              Transform your career with our comprehensive learning platform.
+              The leading marketplace for buying and selling premium social media channels. 
+              Transform your digital presence with established, verified channels.
             </p>
             <div className="flex space-x-4">
               <a href="#" className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center hover:bg-blue-700 transition duration-200">
@@ -57,8 +57,8 @@ export function Footer() {
         <div className="border-t border-gray-800 mt-8 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="mb-4 md:mb-0">
-              <p className="text-gray-400">© 2024 RoyalDev. All rights reserved.</p>
-              <p className="text-sm text-gray-500 mt-1">Powered by RoyalDev</p>
+              <p className="text-gray-400">© 2024 ChannelMarket. All rights reserved.</p>
+              <p className="text-sm text-gray-500 mt-1">Powered by ChannelMarket</p>
             </div>
             <div className="flex items-center space-x-6">
               <div className="text-sm text-gray-400">Accepted Payments:</div>

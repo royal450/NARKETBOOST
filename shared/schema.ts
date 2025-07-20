@@ -18,7 +18,7 @@ export const users = pgTable("users", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const courses = pgTable("courses", {
+export const channels = pgTable("channels", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
   description: text("description").notNull(),
@@ -27,8 +27,8 @@ export const courses = pgTable("courses", {
   discount: integer("discount").default(0),
   category: text("category").notNull(),
   thumbnail: text("thumbnail"),
-  instructor: text("instructor"),
-  instructorId: integer("instructor_id").references(() => users.id),
+  seller: text("seller"),
+  sellerId: integer("seller_id").references(() => users.id),
   likes: integer("likes").default(0),
   comments: integer("comments").default(0),
   sales: integer("sales").default(0),
@@ -38,13 +38,17 @@ export const courses = pgTable("courses", {
   status: text("status").default("pending"), // 'pending' | 'approved' | 'rejected'
   approvalStatus: text("approval_status").default("pending"), // 'pending' | 'approved' | 'rejected'
   rejectionReason: text("rejection_reason"),
+  followerCount: integer("follower_count").default(0),
+  engagementRate: real("engagement_rate").default(0),
+  verificationStatus: text("verification_status").default("unverified"), // 'verified' | 'unverified' | 'pending'
+  platform: text("platform").notNull(), // 'instagram' | 'youtube' | 'facebook' | 'tiktok' | 'twitter' | 'linkedin' | 'telegram'
   createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const payments = pgTable("payments", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id),
-  courseId: integer("course_id").references(() => courses.id),
+  channelId: integer("channel_id").references(() => channels.id),
   amount: integer("amount").notNull(),
   paymentType: text("payment_type").notNull(), // 'indian' | 'international'
   transactionId: text("transaction_id"),
@@ -52,14 +56,14 @@ export const payments = pgTable("payments", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const promotions = pgTable("promotions", {
+export const listings = pgTable("listings", {
   id: serial("id").primaryKey(),
-  courseTitle: text("course_title").notNull(),
+  channelTitle: text("channel_title").notNull(),
   description: text("description").notNull(),
   price: integer("price").notNull(),
   fakePrice: integer("fake_price"),
   category: text("category").notNull(),
-  creatorName: text("creator_name").notNull(),
+  sellerName: text("seller_name").notNull(),
   email: text("email").notNull(),
   whatsapp: text("whatsapp").notNull(),
   status: text("status").default("pending"), // 'pending' | 'approved' | 'rejected'
@@ -90,7 +94,7 @@ export const insertUserSchema = createInsertSchema(users).omit({
   createdAt: true,
 });
 
-export const insertCourseSchema = createInsertSchema(courses).omit({
+export const insertChannelSchema = createInsertSchema(channels).omit({
   id: true,
   likes: true,
   comments: true,
@@ -103,7 +107,7 @@ export const insertPaymentSchema = createInsertSchema(payments).omit({
   createdAt: true,
 });
 
-export const insertPromotionSchema = createInsertSchema(promotions).omit({
+export const insertListingSchema = createInsertSchema(listings).omit({
   id: true,
   status: true,
   createdAt: true,
@@ -116,13 +120,22 @@ export const insertReferralBonusSchema = createInsertSchema(referralBonuses).omi
 });
 
 export type User = typeof users.$inferSelect;
-export type Course = typeof courses.$inferSelect;
+export type Channel = typeof channels.$inferSelect;
 export type Payment = typeof payments.$inferSelect;
-export type Promotion = typeof promotions.$inferSelect;
+export type Listing = typeof listings.$inferSelect;
 export type Analytics = typeof analytics.$inferSelect;
 export type ReferralBonus = typeof referralBonuses.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
-export type InsertCourse = z.infer<typeof insertCourseSchema>;
+export type InsertChannel = z.infer<typeof insertChannelSchema>;
 export type InsertPayment = z.infer<typeof insertPaymentSchema>;
-export type InsertPromotion = z.infer<typeof insertPromotionSchema>;
+export type InsertListing = z.infer<typeof insertListingSchema>;
 export type InsertReferralBonus = z.infer<typeof insertReferralBonusSchema>;
+
+// For backward compatibility (to be removed after full migration)
+export const courses = channels;
+export const insertCourseSchema = insertChannelSchema;
+export const insertPromotionSchema = insertListingSchema;
+export type Course = Channel;
+export type Promotion = Listing;
+export type InsertCourse = InsertChannel;
+export type InsertPromotion = InsertListing;

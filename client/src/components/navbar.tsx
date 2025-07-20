@@ -11,12 +11,12 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { useTheme } from "@/components/theme-provider";
-import { GraduationCap, Bell, ChevronDown, User, Megaphone, Moon, Sun, Settings, LogOut } from "lucide-react";
+import { Smartphone, Bell, ChevronDown, User, Megaphone, Moon, Sun, Settings, LogOut } from "lucide-react";
 
 interface UserStats {
   wallet: number;
   totalSales: number;
-  purchasedCourses: number;
+  purchasedChannels: number;
   todayEarnings: number;
   totalUsers: number;
   visitsToday: number;
@@ -29,7 +29,7 @@ export function Navbar() {
   const [userStats] = useState<UserStats>({
     wallet: 2450,
     totalSales: 15680,
-    purchasedCourses: 12,
+    purchasedChannels: 12,
     todayEarnings: 890,
     totalUsers: 1284,
     visitsToday: 347
@@ -51,9 +51,9 @@ export function Navbar() {
           <div className="flex items-center">
             <div className="flex-shrink-0 flex items-center">
               <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                <GraduationCap className="text-white text-lg" />
+                <Smartphone className="text-white text-lg" />
               </div>
-              <span className="ml-3 text-xl font-bold text-gray-900 dark:text-white">RoyalDev</span>
+              <span className="ml-3 text-xl font-bold text-gray-900 dark:text-white">Channel Market</span>
             </div>
           </div>
           
@@ -64,7 +64,7 @@ export function Navbar() {
               className="text-yellow-600 hover:text-yellow-700 font-medium"
             >
               <Megaphone className="mr-2 h-4 w-4" />
-              Create Course
+              List Channel
             </Button>
             
             <Button variant="ghost" size="icon">

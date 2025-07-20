@@ -1,4 +1,4 @@
-export interface Course {
+export interface Channel {
   id: string;
   title: string;
   description: string;
@@ -16,24 +16,25 @@ export interface Course {
   clickCount?: number;
   viewTime?: number;
   rating?: number;
-  instructor?: string;
-  duration?: string;
-  level?: string;
-  language?: string;
+  seller?: string;
+  followerCount?: number;
+  engagementRate?: number;
+  verificationStatus?: string;
+  platform?: string;
   tags?: string[];
   createdAt?: string;
   updatedAt?: string;
   status?: string;
   earnings?: number;
   popularity?: number;
-  completionRate?: number;
+  transferRate?: number;
   shares?: number;
 }
 
 export interface UserStats {
   wallet: number;
   totalSales: number;
-  purchasedCourses: number;
+  purchasedChannels: number;
   todayEarnings: number;
   totalUsers: number;
   visitsToday: number;
@@ -47,3 +48,7 @@ export interface AdminStats {
   organicTraffic: number;
   referralTraffic: number;
 }
+
+// Backward compatibility
+export interface Course extends Channel {}
+export type { Channel as Course };

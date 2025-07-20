@@ -188,6 +188,7 @@ export default function App() {
           <PublicRoute component={Signup} />
         </Route>
         <Route path="/refer" component={ReferralDetector} />
+        <Route path="/channel/:id" component={ReferralDetector} />
         <Route path="/course/:id" component={ReferralDetector} />
         <Route path="/dashboard" component={DashboardRoute} />
         <Route path="/dashboard-abroad">
@@ -195,6 +196,9 @@ export default function App() {
         </Route>
         <Route path="/profile">
           <ProtectedRoute component={Profile} />
+        </Route>
+        <Route path="/my-channels">
+          <ProtectedRoute component={MyCourses} />
         </Route>
         <Route path="/my-courses">
           <ProtectedRoute component={MyCourses} />
@@ -205,6 +209,9 @@ export default function App() {
         <Route path="/payment">
           <ProtectedRoute component={Payment} />
         </Route>
+        <Route path="/list-channel">
+          <ProtectedRoute component={CreateCourse} />
+        </Route>
         <Route path="/promotion">
           <ProtectedRoute component={CreateCourse} />
         </Route>
@@ -213,6 +220,9 @@ export default function App() {
         </Route>
         <Route path="/admin">
           <ProtectedRoute component={Admin} />
+        </Route>
+        <Route path="/payment/:channelId">
+          <ProtectedRoute component={Payment} />
         </Route>
         <Route path="/payment/:courseId">
           <ProtectedRoute component={Payment} />
