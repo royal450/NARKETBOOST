@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
-import { ref, set, push } from "firebase/database";
+import { ref, set } from "firebase/database";
 import { database } from "@/lib/firebase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Upload, BookOpen, DollarSign, Info, AlertTriangle } from "lucide-react";
+import { Upload, Megaphone, DollarSign, Info, AlertTriangle, Sparkles } from "lucide-react";
 import { useLocation } from "wouter";
 
 export default function ListChannel() {
@@ -29,6 +29,7 @@ export default function ListChannel() {
       </div>
     );
   }
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -50,13 +51,14 @@ export default function ListChannel() {
 
   const platforms = [
     { id: "youtube", label: "YouTube Channel", image: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=400&h=300&fit=crop" },
-    { id: "instagram", label: "Instagram Channel", image: "https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?w=400&h=300&fit=crop" },
-    { id: "tiktok", label: "TikTok Channel", image: "https://images.unsplash.com/photo-1611162618071-b39a2ec055fb?w=400&h=300&fit=crop" },
-    { id: "twitter", label: "Twitter/X Channel", image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=300&fit=crop" },
-    { id: "facebook", label: "Facebook Page", image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=300&fit=crop" },
+    { id: "instagram", label: "Instagram Account", image: "https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?w=400&h=300&fit=crop" },
+    { id: "tiktok", label: "TikTok Account", image: "https://images.unsplash.com/photo-1611162618071-b39a2ec055fb?w=400&h=300&fit=crop" },
+    { id: "twitter", label: "Twitter/X Account", image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=300&fit=crop" },
+    { id: "facebook", label: "Facebook Page/Group", image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=300&fit=crop" },
     { id: "linkedin", label: "LinkedIn Page", image: "https://images.unsplash.com/photo-1493612276216-ee3925520721?w=400&h=300&fit=crop" },
     { id: "telegram", label: "Telegram Channel", image: "https://images.unsplash.com/photo-1611162617213-7d7a39e9b377?w=400&h=300&fit=crop" },
-    { id: "discord", label: "Discord Server", image: "https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?w=400&h=300&fit=crop" }
+    { id: "discord", label: "Discord Server", image: "https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?w=400&h=300&fit=crop" },
+    { id: "reels-bundle", label: "Reels Bundle", image: "https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?w=400&h=300&fit=crop" },
   ];
 
   const categories = [
@@ -83,7 +85,7 @@ export default function ListChannel() {
     if (!user) {
       toast({
         title: "Authentication Required",
-        description: "Please login to create a course",
+        description: "Please login to list your channel",
         variant: "destructive",
       });
       return;
@@ -93,7 +95,7 @@ export default function ListChannel() {
     if (!formData.title.trim()) {
       toast({
         title: "Title Required",
-        description: "Please enter a course title",
+        description: "Please enter a channel title",
         variant: "destructive",
       });
       return;
@@ -102,7 +104,7 @@ export default function ListChannel() {
     if (!formData.description.trim()) {
       toast({
         title: "Description Required",
-        description: "Please enter a course description",
+        description: "Please enter a channel description",
         variant: "destructive",
       });
       return;
@@ -117,6 +119,15 @@ export default function ListChannel() {
       return;
     }
 
+    if (!formData.platform) {
+      toast({
+        title: "Platform Required",
+        description: "Please select a platform",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (!formData.category) {
       toast({
         title: "Category Required",
@@ -126,10 +137,10 @@ export default function ListChannel() {
       return;
     }
 
-    if (!formData.courseLink.trim()) {
+    if (!formData.channelLink.trim()) {
       toast({
-        title: "Course Link Required",
-        description: "Please provide your course access link",
+        title: "Channel Link Required",
+        description: "Please provide your channel link",
         variant: "destructive",
       });
       return;
@@ -138,59 +149,59 @@ export default function ListChannel() {
     setLoading(true);
 
     try {
-      const courseId = Date.now().toString();
+      const channelId = Date.now().toString();
       
       // Get automatic category-based image if no thumbnail provided
       const selectedCategory = categories.find(cat => cat.id === formData.category);
       const autoThumbnail = selectedCategory?.image || "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=400&h=300&fit=crop";
       
-      const courseData = {
+      const channelData = {
         ...formData,
-        id: courseId,
-        instructor: user.displayName || user.email,
-        instructorId: user.uid,
-        instructorEmail: user.email,
-        instructorName: user.displayName || user.email?.split('@')[0],
+        id: channelId,
+        seller: user.displayName || user.email,
+        sellerId: user.uid,
+        sellerEmail: user.email,
+        sellerName: user.displayName || user.email?.split('@')[0],
         price: parseInt(formData.price) || 0,
         fakePrice: parseInt(formData.fakePrice) || 0,
         discount: formData.fakePrice && formData.price ? 
           Math.round(((parseInt(formData.fakePrice) - parseInt(formData.price)) / parseInt(formData.fakePrice)) * 100) : 0,
-        thumbnail: formData.thumbnail.trim() || autoThumbnail, // Automatic category image if empty
-        courseLink: formData.courseLink, // Admin review के लिए
+        thumbnail: formData.thumbnail.trim() || autoThumbnail,
+        channelLink: formData.channelLink,
         tags: formData.tags.split(',').map(tag => tag.trim()),
-        requirements: formData.requirements.split('\n').filter(req => req.trim()),
-        whatYouLearn: formData.whatYouLearn.split('\n').filter(learn => learn.trim()),
-        courseContent: formData.courseContent.split('\n').filter(content => content.trim()),
+        targetAudience: formData.targetAudience.split('\n').filter(aud => aud.trim()),
+        contentType: formData.contentType.split('\n').filter(ct => ct.trim()),
+        analytics: formData.analytics.split('\n').filter(an => an.trim()),
         status: "pending_review",
         approvalStatus: "pending",
         blocked: false,
         rejectionReason: null,
         commission: 30,
-        likes: Math.floor(Math.random() * 95) + 5, // Fake likes 5-100 (marketing limit)
-        comments: Math.floor(Math.random() * 16) + 4, // Fake comments 4-20
-        sales: 0, // Real sales start from 0
-        rating: 1.1, // New course rating
+        likes: Math.floor(Math.random() * 95) + 5,
+        comments: Math.floor(Math.random() * 16) + 4,
+        sales: 0,
+        rating: 1.1,
         reviews: 0,
-        views: Math.floor(Math.random() * 9000) + 1000, // Fake views 1K-10K (marketing limit)
+        views: Math.floor(Math.random() * 9000) + 1000,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
 
-      // Save course to Firebase
-      await set(ref(database, `courses/${courseId}`), courseData);
+      // Save to Firebase (changed to channels for consistency)
+      await set(ref(database, `channels/${channelId}`), channelData);
 
-      // Update user's courses
-      const userCoursesRef = ref(database, `users/${user.uid}/myCourses/${courseId}`);
-      await set(userCoursesRef, {
-        courseId,
+      // Update user's listings
+      const userChannelsRef = ref(database, `users/${user.uid}/myChannels/${channelId}`);
+      await set(userChannelsRef, {
+        channelId,
         title: formData.title,
         status: "pending_review",
         createdAt: new Date().toISOString(),
       });
 
       toast({
-        title: "Course Created Successfully! 🎉",
-        description: "Your course has been submitted for review. You'll be notified once it's approved.",
+        title: "Channel Listed Successfully! 🎉",
+        description: "Your channel has been submitted for review. You'll be notified once it's approved.",
       });
 
       // Reset form
@@ -199,23 +210,25 @@ export default function ListChannel() {
         description: "",
         price: "",
         fakePrice: "",
+        platform: "",
         category: "",
         thumbnail: "",
-        courseLink: "",
-        duration: "",
-        level: "beginner",
-        language: "Hindi",
+        channelLink: "",
+        followerCount: "",
+        engagementRate: "",
+        niche: "lifestyle",
+        monetization: "yes",
         tags: "",
-        requirements: "",
-        whatYouLearn: "",
-        courseContent: "",
+        targetAudience: "",
+        contentType: "",
+        analytics: "",
       });
 
-      setLocation("/my-courses");
+      setLocation("/my-channels");
     } catch (error) {
-      console.error("Error creating course:", error);
+      console.error("Error listing channel:", error);
       toast({
-        title: "Error Creating Course",
+        title: "Error Listing Channel",
         description: "Please try again later",
         variant: "destructive",
       });
@@ -225,52 +238,83 @@ export default function ListChannel() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-600 to-blue-700 p-4">
-      <div className="max-w-4xl mx-auto">
-        <Card className="bg-white/95 backdrop-blur-sm shadow-2xl">
-          <CardHeader className="text-center">
-            <div className="mx-auto w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center mb-4">
-              <BookOpen className="text-white text-2xl" />
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-cyan-50 dark:from-gray-900 dark:via-purple-900 dark:to-cyan-900 select-none relative overflow-hidden">
+      {/* Animated Background Elements */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-cyan-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse delay-2000"></div>
+      </div>
+
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <Card className="w-full max-w-4xl bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm shadow-2xl rounded-2xl overflow-hidden">
+          <CardHeader className="text-center py-12 bg-gradient-to-r from-purple-600 to-blue-600 text-white relative">
+            <div className="absolute top-4 left-4">
+              <Button variant="ghost" onClick={() => setLocation("/dashboard")} className="text-white hover:bg-white/20">
+                ← Back
+              </Button>
             </div>
-            <CardTitle className="text-3xl font-bold text-gray-800">Create Your Course</CardTitle>
-            <p className="text-gray-600 mt-2">Share your knowledge and earn 70% commission on every sale</p>
+            <div className="mx-auto w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mb-6 animate-bounce">
+              <Megaphone className="text-white w-10 h-10" />
+            </div>
+            <CardTitle className="text-4xl font-bold mb-2">List Your Channel</CardTitle>
+            <p className="text-lg opacity-90">Sell your social media channels or reels bundles and earn 70% commission</p>
           </CardHeader>
           
           <CardContent className="p-8">
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-              <div className="flex items-center mb-2">
-                <AlertTriangle className="w-5 h-5 text-red-600 mr-2" />
-                <h4 className="font-semibold text-red-800">⚠️ Important Course Terms & Conditions</h4>
+            <div className="bg-red-50 border border-red-200 rounded-lg p-6 mb-8 shadow-md">
+              <div className="flex items-center mb-4">
+                <AlertTriangle className="w-6 h-6 text-red-600 mr-3" />
+                <h4 className="font-semibold text-red-800 text-lg">⚠️ Important Listing Terms & Conditions</h4>
               </div>
-              <ul className="text-sm text-red-700 space-y-1">
-                <li>• <strong>Commission:</strong> You earn 70% on every sale, platform takes 30%</li>
-                <li>• <strong>Review:</strong> Course will be reviewed within 1 hour (not 24-48 hours)</li>
-                <li>• <strong>Course Link:</strong> Must provide working course access link (mandatory)</li>
-                <li>• <strong>Link Monitoring:</strong> System monitors your link 24/7 for accessibility</li>
-                <li>• <strong>Link Issues:</strong> If link expires/inaccessible, you have 3 hours to fix via email</li>
-                <li>• <strong>Fraud Prevention:</strong> Links inaccessible for 5+ hours = Course deletion</li>
-                <li>• <strong>Trust Policy:</strong> Ensure your course link is ALWAYS active and accessible</li>
-                <li>• <strong>Quality:</strong> Original, high-quality content only - no spam/duplicate content</li>
+              <ul className="text-sm text-red-700 space-y-2">
+                <li className="flex items-start"><Sparkles className="w-4 h-4 mr-2 mt-1" /> <span><strong>Commission:</strong> You earn 70% on every sale, platform takes 30%</span></li>
+                <li className="flex items-start"><Sparkles className="w-4 h-4 mr-2 mt-1" /> <span><strong>Review:</strong> Listing will be reviewed within 1 hour</span></li>
+                <li className="flex items-start"><Sparkles className="w-4 h-4 mr-2 mt-1" /> <span><strong>Channel Link:</strong> Must provide valid channel link (mandatory)</span></li>
+                <li className="flex items-start"><Sparkles className="w-4 h-4 mr-2 mt-1" /> <span><strong>Link Monitoring:</strong> System monitors your link 24/7</span></li>
+                <li className="flex items-start"><Sparkles className="w-4 h-4 mr-2 mt-1" /> <span><strong>Link Issues:</strong> Fix within 3 hours if inaccessible</span></li>
+                <li className="flex items-start"><Sparkles className="w-4 h-4 mr-2 mt-1" /> <span><strong>Fraud Prevention:</strong> Inaccessible for 5+ hours = Deletion</span></li>
+                <li className="flex items-start"><Sparkles className="w-4 h-4 mr-2 mt-1" /> <span><strong>Trust Policy:</strong> Keep link always active</span></li>
+                <li className="flex items-start"><Sparkles className="w-4 h-4 mr-2 mt-1" /> <span><strong>Quality:</strong> Authentic channels only - no fake accounts</span></li>
               </ul>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <Label htmlFor="title">Course Title *</Label>
+                  <Label htmlFor="title" className="text-lg font-medium">Channel Title *</Label>
                   <Input
                     id="title"
                     value={formData.title}
                     onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                    placeholder="e.g., Complete YouTube Growth Masterclass"
+                    placeholder="e.g., Premium Instagram Reels Bundle"
+                    className="mt-2 py-6 text-lg"
                     required
                   />
                 </div>
                 
                 <div>
-                  <Label htmlFor="category">Category *</Label>
+                  <Label htmlFor="platform" className="text-lg font-medium">Platform *</Label>
+                  <Select value={formData.platform} onValueChange={(value) => setFormData(prev => ({ ...prev, platform: value }))}>
+                    <SelectTrigger className="mt-2 py-6 text-lg">
+                      <SelectValue placeholder="Select platform" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {platforms.map((plat) => (
+                        <SelectItem key={plat.id} value={plat.id}>
+                          {plat.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <Label htmlFor="category" className="text-lg font-medium">Category *</Label>
                   <Select value={formData.category} onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}>
-                    <SelectTrigger>
+                    <SelectTrigger className="mt-2 py-6 text-lg">
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
                     <SelectContent>
@@ -282,182 +326,196 @@ export default function ListChannel() {
                     </SelectContent>
                   </Select>
                 </div>
+
+                <div>
+                  <Label htmlFor="niche" className="text-lg font-medium">Niche *</Label>
+                  <Select value={formData.niche} onValueChange={(value) => setFormData(prev => ({ ...prev, niche: value }))}>
+                    <SelectTrigger className="mt-2 py-6 text-lg">
+                      <SelectValue placeholder="Select niche" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="lifestyle">Lifestyle</SelectItem>
+                      <SelectItem value="tech">Tech</SelectItem>
+                      <SelectItem value="business">Business</SelectItem>
+                      <SelectItem value="creative">Creative</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
               <div>
-                <Label htmlFor="description">Course Description *</Label>
+                <Label htmlFor="description" className="text-lg font-medium">Channel Description *</Label>
                 <Textarea
                   id="description"
                   value={formData.description}
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  placeholder="Describe what students will learn in this course..."
-                  rows={4}
+                  placeholder="Describe your channel, audience, content strategy..."
+                  rows={6}
+                  className="mt-2 text-lg"
                   required
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
-                  <Label htmlFor="price">Course Price (₹) *</Label>
+                  <Label htmlFor="price" className="text-lg font-medium">Selling Price (₹) *</Label>
                   <Input
                     id="price"
                     type="number"
                     value={formData.price}
                     onChange={(e) => setFormData(prev => ({ ...prev, price: e.target.value }))}
                     placeholder="999"
+                    className="mt-2 py-6 text-lg"
                     required
                   />
                 </div>
                 
                 <div>
-                  <Label htmlFor="fakePrice">Original Price (₹) *</Label>
+                  <Label htmlFor="fakePrice" className="text-lg font-medium">Original Price (₹)</Label>
                   <Input
                     id="fakePrice"
                     type="number"
                     value={formData.fakePrice}
                     onChange={(e) => setFormData(prev => ({ ...prev, fakePrice: e.target.value }))}
                     placeholder="1999"
-                    required
+                    className="mt-2 py-6 text-lg"
                   />
                 </div>
                 
                 <div>
-                  <Label htmlFor="duration">Duration</Label>
+                  <Label htmlFor="followerCount" className="text-lg font-medium">Follower Count</Label>
                   <Input
-                    id="duration"
-                    value={formData.duration}
-                    onChange={(e) => setFormData(prev => ({ ...prev, duration: e.target.value }))}
-                    placeholder="e.g., 3 hours"
+                    id="followerCount"
+                    type="number"
+                    value={formData.followerCount}
+                    onChange={(e) => setFormData(prev => ({ ...prev, followerCount: e.target.value }))}
+                    placeholder="e.g., 10000"
+                    className="mt-2 py-6 text-lg"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <Label htmlFor="level">Course Level *</Label>
-                  <Select value={formData.level} onValueChange={(value) => setFormData(prev => ({ ...prev, level: value }))}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select level" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="beginner">Beginner</SelectItem>
-                      <SelectItem value="intermediate">Intermediate</SelectItem>
-                      <SelectItem value="advanced">Advanced</SelectItem>
-                      <SelectItem value="all-levels">All Levels</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Label htmlFor="engagementRate" className="text-lg font-medium">Engagement Rate (%)</Label>
+                  <Input
+                    id="engagementRate"
+                    type="number"
+                    value={formData.engagementRate}
+                    onChange={(e) => setFormData(prev => ({ ...prev, engagementRate: e.target.value }))}
+                    placeholder="e.g., 5.2"
+                    className="mt-2 py-6 text-lg"
+                    step="0.1"
+                  />
                 </div>
-                
+
                 <div>
-                  <Label htmlFor="language">Language *</Label>
-                  <Select value={formData.language} onValueChange={(value) => setFormData(prev => ({ ...prev, language: value }))}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select language" />
+                  <Label htmlFor="monetization" className="text-lg font-medium">Monetized? *</Label>
+                  <Select value={formData.monetization} onValueChange={(value) => setFormData(prev => ({ ...prev, monetization: value }))}>
+                    <SelectTrigger className="mt-2 py-6 text-lg">
+                      <SelectValue placeholder="Select status" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Hindi">Hindi</SelectItem>
-                      <SelectItem value="English">English</SelectItem>
-                      <SelectItem value="Hinglish">Hinglish</SelectItem>
-                      <SelectItem value="Tamil">Tamil</SelectItem>
-                      <SelectItem value="Telugu">Telugu</SelectItem>
-                      <SelectItem value="Bengali">Bengali</SelectItem>
-                      <SelectItem value="Marathi">Marathi</SelectItem>
-                      <SelectItem value="Gujarati">Gujarati</SelectItem>
-                      <SelectItem value="Punjabi">Punjabi</SelectItem>
-                      <SelectItem value="Kannada">Kannada</SelectItem>
-                      <SelectItem value="Malayalam">Malayalam</SelectItem>
-                      <SelectItem value="Urdu">Urdu</SelectItem>
+                      <SelectItem value="yes">Yes</SelectItem>
+                      <SelectItem value="no">No</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
 
               <div>
-                <Label htmlFor="thumbnail">Course Thumbnail URL</Label>
+                <Label htmlFor="thumbnail" className="text-lg font-medium">Thumbnail URL</Label>
                 <Input
                   id="thumbnail"
                   type="url"
                   value={formData.thumbnail}
                   onChange={(e) => setFormData(prev => ({ ...prev, thumbnail: e.target.value }))}
                   placeholder="https://example.com/thumbnail.jpg"
+                  className="mt-2 py-6 text-lg"
                 />
               </div>
 
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <Label htmlFor="courseLink" className="text-yellow-800 font-medium">
-                  🔗 Course Access Link * (Admin Review Only)
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 shadow-md">
+                <Label htmlFor="channelLink" className="text-lg font-medium text-yellow-800">
+                  🔗 Channel Link * (Admin Review Only)
                 </Label>
                 <Input
-                  id="courseLink"
+                  id="channelLink"
                   type="url"
-                  value={formData.courseLink}
-                  onChange={(e) => setFormData(prev => ({ ...prev, courseLink: e.target.value }))}
-                  placeholder="https://your-course-platform.com/your-course"
-                  className="mt-2 border-yellow-300 focus:border-yellow-500"
+                  value={formData.channelLink}
+                  onChange={(e) => setFormData(prev => ({ ...prev, channelLink: e.target.value }))}
+                  placeholder="https://instagram.com/yourchannel"
+                  className="mt-2 py-6 text-lg border-yellow-300 focus:border-yellow-500"
                   required
                 />
-                <p className="text-xs text-yellow-700 mt-1">
-                  This link will only be visible to admin for course review. Make sure it's always accessible!
+                <p className="text-sm text-yellow-700 mt-2">
+                  This link is for admin verification only. Ensure it's valid and accessible!
                 </p>
               </div>
 
               <div>
-                <Label htmlFor="tags">Tags (comma-separated)</Label>
+                <Label htmlFor="tags" className="text-lg font-medium">Tags (comma-separated)</Label>
                 <Input
                   id="tags"
                   value={formData.tags}
                   onChange={(e) => setFormData(prev => ({ ...prev, tags: e.target.value }))}
-                  placeholder="youtube, marketing, growth, social media"
+                  placeholder="instagram, reels, growth, social media"
+                  className="mt-2 py-6 text-lg"
                 />
               </div>
 
               <div>
-                <Label htmlFor="requirements">Requirements (one per line)</Label>
+                <Label htmlFor="targetAudience" className="text-lg font-medium">Target Audience (one per line)</Label>
                 <Textarea
-                  id="requirements"
-                  value={formData.requirements}
-                  onChange={(e) => setFormData(prev => ({ ...prev, requirements: e.target.value }))}
-                  placeholder="Basic computer knowledge&#10;Internet connection&#10;Willingness to learn"
-                  rows={3}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="whatYouLearn">What You'll Learn (one per line)</Label>
-                <Textarea
-                  id="whatYouLearn"
-                  value={formData.whatYouLearn}
-                  onChange={(e) => setFormData(prev => ({ ...prev, whatYouLearn: e.target.value }))}
-                  placeholder="YouTube channel optimization&#10;Video SEO techniques&#10;Monetization strategies"
+                  id="targetAudience"
+                  value={formData.targetAudience}
+                  onChange={(e) => setFormData(prev => ({ ...prev, targetAudience: e.target.value }))}
+                  placeholder="Young professionals&#10;Fashion enthusiasts&#10;Business owners"
                   rows={4}
+                  className="mt-2 text-lg"
                 />
               </div>
 
               <div>
-                <Label htmlFor="courseContent">Course Content (one topic per line)</Label>
+                <Label htmlFor="contentType" className="text-lg font-medium">Content Types (one per line)</Label>
                 <Textarea
-                  id="courseContent"
-                  value={formData.courseContent}
-                  onChange={(e) => setFormData(prev => ({ ...prev, courseContent: e.target.value }))}
-                  placeholder="Introduction to YouTube&#10;Channel Setup and Branding&#10;Content Creation Strategies"
-                  rows={5}
+                  id="contentType"
+                  value={formData.contentType}
+                  onChange={(e) => setFormData(prev => ({ ...prev, contentType: e.target.value }))}
+                  placeholder="Short reels&#10;Stories&#10;Posts"
+                  rows={4}
+                  className="mt-2 text-lg"
                 />
               </div>
 
-              <div className="flex justify-between items-center pt-6">
+              <div>
+                <Label htmlFor="analytics" className="text-lg font-medium">Analytics/Stats (one per line)</Label>
+                <Textarea
+                  id="analytics"
+                  value={formData.analytics}
+                  onChange={(e) => setFormData(prev => ({ ...prev, analytics: e.target.value }))}
+                  placeholder="Avg views: 10k&#10;Avg likes: 500&#10;Growth rate: 15%/month"
+                  rows={4}
+                  className="mt-2 text-lg"
+                />
+              </div>
+
+              <div className="flex justify-between items-center pt-8">
                 <Button 
                   type="button" 
                   variant="outline" 
                   onClick={() => setLocation("/dashboard")}
+                  className="px-8 py-4 text-lg rounded-full"
                 >
                   Cancel
                 </Button>
                 <Button 
                   type="submit" 
                   disabled={loading}
-                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                  className="px-8 py-4 text-lg rounded-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 shadow-lg hover:shadow-xl transition-all"
                 >
-                  {loading ? "Creating Course..." : "Create Course"}
+                  {loading ? "Listing Channel..." : "List Channel Now"}
                 </Button>
               </div>
             </form>

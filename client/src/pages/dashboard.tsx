@@ -76,7 +76,7 @@ export default function Dashboard() {
   }, [courses]);
 
   useEffect(() => {
-    let filtered = shuffledCourses;
+    let filtered = shuffledChannels;
 
     // Apply category filter
     if (activeFilter !== "all") {
@@ -92,8 +92,8 @@ export default function Dashboard() {
       );
     }
 
-    setFilteredCourses(filtered);
-  }, [shuffledCourses, activeFilter, searchTerm]);
+    setFilteredChannels(filtered);
+  }, [shuffledChannels, activeFilter, searchTerm]);
 
   const handleBuyNow = (course: Course) => {
     // Track user interaction
@@ -106,7 +106,7 @@ export default function Dashboard() {
   };
 
   const handleCourseHover = (courseId: string) => {
-    setHoveredCourse(courseId);
+    setHoveredChannel(courseId);
     setUserInteractions(prev => ({
       ...prev,
       [courseId]: (prev[courseId] || 0) + 1
@@ -297,7 +297,7 @@ export default function Dashboard() {
             </p>
           </div>
 
-          {filteredCourses.length === 0 ? (
+          {filteredChannels.length === 0 ? (
             <div className="text-center py-16">
               <div className="w-32 h-32 bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-800 dark:to-pink-800 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Search className="w-16 h-16 text-purple-500 dark:text-purple-400" />
@@ -307,13 +307,13 @@ export default function Dashboard() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 w-full">
-              {filteredCourses.map((course, index) => (
+              {filteredChannels.map((course, index) => (
                 <div
                   key={course.id}
                   className="animate-fadeIn"
                   style={{ animationDelay: `${index * 0.1}s` }}
                   onMouseEnter={() => handleCourseHover(course.id)}
-                  onMouseLeave={() => setHoveredCourse(null)}
+                  onMouseLeave={() => setHoveredChannel(null)}
                 >
                   <CourseCard
                     course={course}
