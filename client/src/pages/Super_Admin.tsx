@@ -49,6 +49,7 @@ export default function SuperAdmin() {
   const [bonusAmount, setBonusAmount] = useState(0);
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [rejectionReason, setRejectionReason] = useState("");
+  const [bonusBadgeText, setBonusBadgeText] = useState("🔥 HOT DEAL");
   const [newThumbnail, setNewThumbnail] = useState("");
   const [withdrawalToProcess, setWithdrawalToProcess] = useState<WithdrawalRequest | null>(null);
   
@@ -187,6 +188,52 @@ export default function SuperAdmin() {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/channels'] });
     }
   });
+
+  // Sold Out Handler
+  const handleSoldOut = async (channelId: number, soldOut: boolean) => {
+    try {
+      const endpoint = soldOut ? 'sold-out' : 'remove-sold-out';
+      await apiRequest(`/api/courses/${channelId}/${endpoint}`, {
+        method: 'PUT'
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/channels'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/courses'] });
+      toast({
+        title: soldOut ? "Channel marked as sold out" : "Sold out removed",
+        description: soldOut ? "🔴 Channel is now sold out" : "✅ Channel is available again"
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update sold out status",
+        variant: "destructive"
+      });
+    }
+  };
+
+  // Bonus Badge Handler
+  const handleBonusBadge = async (channelId: number, badgeText: string) => {
+    try {
+      await apiRequest(`/api/courses/${channelId}/bonus-badge`, {
+        method: 'PUT',
+        body: JSON.stringify({ badgeText, badgeType: 'custom' }),
+        headers: { 'Content-Type': 'application/json' }
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/channels'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/courses'] });
+      toast({
+        title: "Bonus badge added",
+        description: `🏆 Badge "${badgeText}" added to channel`
+      });
+      setBonusBadgeText("🔥 HOT DEAL");
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to add bonus badge",
+        variant: "destructive"
+      });
+    }
+  };
 
   if (!isAuthenticated) {
     return (
@@ -504,6 +551,42 @@ export default function SuperAdmin() {
                             {channel.blocked ? <Eye className="w-4 h-4 mr-1" /> : <EyeOff className="w-4 h-4 mr-1" />}
                             {channel.blocked ? 'Unblock' : 'Block'}
                           </Button>
+                          
+                          <Button
+                            size="sm"
+                            onClick={() => handleSoldOut(channel.id, !channel.soldOut)}
+                            className={channel.soldOut ? "bg-green-500 hover:bg-green-600" : "bg-red-500 hover:bg-red-600"}
+                          >
+                            {channel.soldOut ? '✅ Remove Sold Out' : '🔴 Mark Sold Out'}
+                          </Button>
+                          
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button size="sm" className="bg-yellow-500 hover:bg-yellow-600">
+                                🏆 Bonus Badge
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                              <DialogHeader>
+                                <DialogTitle>Add Bonus Badge</DialogTitle>
+                                <DialogDescription>
+                                  Add a special bonus badge to this channel
+                                </DialogDescription>
+                              </DialogHeader>
+                              <Input
+                                value={bonusBadgeText}
+                                onChange={(e) => setBonusBadgeText(e.target.value)}
+                                placeholder="Badge text (e.g., 🔥 HOT DEAL)"
+                              />
+                              <DialogFooter>
+                                <Button
+                                  onClick={() => handleBonusBadge(channel.id, bonusBadgeText)}
+                                >
+                                  Add Badge
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
                           
                           <Button
                             size="sm"

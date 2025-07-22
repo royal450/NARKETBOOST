@@ -67,14 +67,7 @@ export function Navbar() {
               Submit Channel
             </Button>
             
-            <Button 
-              variant="ghost" 
-              onClick={() => setLocation("/super-admin")}
-              className="text-purple-600 hover:text-purple-700 font-medium"
-            >
-              <Settings className="mr-2 h-4 w-4" />
-              Super Admin
-            </Button>
+
             
             <Button variant="ghost" size="icon">
               <Bell className="h-5 w-5 text-gray-500" />
