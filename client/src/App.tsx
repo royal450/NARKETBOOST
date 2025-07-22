@@ -1,10 +1,10 @@
 import { Switch, Route, useLocation } from "wouter";
 import { QueryClientProvider } from "@tanstack/react-query";
+import { lazy, Suspense, useEffect } from "react";
 import { queryClient } from "@/lib/queryClient";
 import { AuthProvider } from "@/hooks/use-auth";
-import { Toaster } from "@/components/ui/toaster";
-import { lazy, Suspense, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
+import { Toaster } from "@/components/ui/toaster";
 import Dashboard from "@/pages/dashboard";
 import DashboardAbroad from "@/pages/dashboard-abroad";
 import Login from "@/pages/login";
@@ -234,6 +234,14 @@ export default function App() {
           <ProtectedRoute component={CreateCourse} />
         </Route>
         <Route path="/admin">
+          <ProtectedRoute component={AdminPanel} />
+        </Route>
+        <Route path="/admin-full">
+          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
+            <FullFeaturedAdmin />
+          </Suspense>
+        </Route>
+        <Route path="/admin-panel">
           <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
             <FullFeaturedAdmin />
           </Suspense>
@@ -253,7 +261,17 @@ export default function App() {
             <ProtectedRoute component={EnhancedChannelSubmission} />
           </Suspense>
         </Route>
+        <Route path="/channel-submission">
+          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
+            <ProtectedRoute component={EnhancedChannelSubmission} />
+          </Suspense>
+        </Route>
         <Route path="/channels">
+          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
+            <ChannelShowCard />
+          </Suspense>
+        </Route>
+        <Route path="/channel-marketplace">
           <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
             <ChannelShowCard />
           </Suspense>
