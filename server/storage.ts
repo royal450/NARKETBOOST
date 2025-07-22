@@ -60,6 +60,90 @@ export class MemStorage implements IStorage {
   }
 
   private initializeSampleData() {
+    // Add sample real users
+    const sampleUsers: User[] = [
+      {
+        id: 1,
+        email: "admin@channelmarket.com",
+        displayName: "Super Admin",
+        photoURL: null,
+        location: "India",
+        referralCode: "ADMIN123",
+        referredBy: null,
+        walletBalance: 5000,
+        totalEarnings: 15000,
+        totalReferrals: 25,
+        isActive: true,
+        lastActiveAt: new Date(),
+        createdAt: new Date()
+      },
+      {
+        id: 2,
+        email: "rahul.kumar@gmail.com",
+        displayName: "Rahul Kumar",
+        photoURL: null,
+        location: "Delhi, India",
+        referralCode: "RK2024",
+        referredBy: null,
+        walletBalance: 1500,
+        totalEarnings: 3200,
+        totalReferrals: 8,
+        isActive: true,
+        lastActiveAt: new Date(),
+        createdAt: new Date()
+      },
+      {
+        id: 3,
+        email: "priya.sharma@gmail.com",
+        displayName: "Priya Sharma",
+        photoURL: null,
+        location: "Mumbai, India",
+        referralCode: "PRIYA001",
+        referredBy: 1,
+        walletBalance: 2300,
+        totalEarnings: 4500,
+        totalReferrals: 12,
+        isActive: true,
+        lastActiveAt: new Date(),
+        createdAt: new Date()
+      },
+      {
+        id: 4,
+        email: "ankit.verma@outlook.com",
+        displayName: "Ankit Verma",
+        photoURL: null,
+        location: "Bangalore, India",
+        referralCode: "ANKIT99",
+        referredBy: 2,
+        walletBalance: 850,
+        totalEarnings: 1200,
+        totalReferrals: 5,
+        isActive: true,
+        lastActiveAt: new Date(),
+        createdAt: new Date()
+      },
+      {
+        id: 5,
+        email: "neha.singh@yahoo.com",
+        displayName: "Neha Singh",
+        photoURL: null,
+        location: "Pune, India",
+        referralCode: "NEHA456",
+        referredBy: 1,
+        walletBalance: 3200,
+        totalEarnings: 7800,
+        totalReferrals: 18,
+        isActive: true,
+        lastActiveAt: new Date(),
+        createdAt: new Date()
+      }
+    ];
+
+    sampleUsers.forEach(user => {
+      this.users.set(user.id, user);
+    });
+    this.currentUserId = 6;
+
     // Add sample services for testing
     const sampleServices: Channel[] = [
       {
@@ -306,48 +390,8 @@ export class MemStorage implements IStorage {
 
   // Users management methods
   async getUsers(): Promise<User[]> {
-    const userArray = Array.from(this.users.values());
-
-    // If no users in database, return sample users for testing
-    if (userArray.length === 0) {
-      return [
-        {
-          id: 1,
-          email: "admin@example.com",
-          displayName: "Super Admin",
-          walletBalance: 5000,
-          totalReferrals: 25,
-          isActive: true,
-          lastActiveAt: new Date(),
-          createdAt: new Date(),
-          referralCode: "ADMIN123"
-        },
-        {
-          id: 2,
-          email: "user1@example.com", 
-          displayName: "John Doe",
-          walletBalance: 1500,
-          totalReferrals: 10,
-          isActive: true,
-          lastActiveAt: new Date(),
-          createdAt: new Date(),
-          referralCode: "USER001"
-        },
-        {
-          id: 3,
-          email: "user2@example.com",
-          displayName: "Jane Smith", 
-          walletBalance: 2300,
-          totalReferrals: 15,
-          isActive: true,
-          lastActiveAt: new Date(),
-          createdAt: new Date(),
-          referralCode: "USER002"
-        }
-      ];
-    }
-
-    return userArray;
+    // Always return real users from storage
+    return Array.from(this.users.values());
   }
 
   // Alias method for getRealUsers

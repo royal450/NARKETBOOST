@@ -332,6 +332,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // Get real users from database, not mock data
       const users = await storage.getUsers();
+      console.log(`Real users found: ${users.length}`);
+      console.log("Users data:", users.map(u => ({ id: u.id, name: u.displayName, email: u.email })));
       res.json(users);
     } catch (error) {
       console.error("Error fetching users:", error);

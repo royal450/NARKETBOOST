@@ -45,6 +45,7 @@ export function ChannelCard({ channel, onBuyNow }: ChannelCardProps) {
   const [engagementRate] = useState(channelData.engagementRate || (Math.random() * 8 + 2).toFixed(1));
   const [showCommentDialog, setShowCommentDialog] = useState(false);
   const [comment, setComment] = useState("");
+  const [showCommentsView, setShowCommentsView] = useState(false);
 
 
   // Realistic mixed names with 80% Indian names
@@ -260,9 +261,14 @@ export function ChannelCard({ channel, onBuyNow }: ChannelCardProps) {
       avatar: (user?.displayName || user?.email || "A").charAt(0).toUpperCase()
     };
 
-    setComments(prev => [newCommentObj, ...prev]);
+    const updatedComments = [newCommentObj, ...comments];
+    setComments(updatedComments);
+    setCommentCount(updatedComments.length);
     setComment("");
     setShowCommentDialog(false);
+
+    // Store updated comments in localStorage
+    localStorage.setItem(`comments_${channelData.id}`, JSON.stringify(updatedComments));
 
     toast({
       title: "Comment Added! 💬",
@@ -295,7 +301,10 @@ export function ChannelCard({ channel, onBuyNow }: ChannelCardProps) {
   };
 
     return (
-    <div className="bg-gradient-to-br from-white via-purple-50/30 to-cyan-50/30 dark:from-gray-800 dark:via-purple-900/30 dark:to-cyan-900/30 rounded-2xl shadow-xl border border-purple-200/50 dark:border-purple-700/50 backdrop-blur-sm hover:shadow-2xl transition-all duration-500 group overflow-hidden relative">
+    <div className={`${channelData.bonusBadge 
+      ? 'bg-gradient-to-br from-yellow-50 via-amber-50/80 to-orange-50/60 border-2 border-yellow-300/60 shadow-2xl shadow-yellow-200/40' 
+      : 'bg-gradient-to-br from-white via-purple-50/30 to-cyan-50/30 border border-purple-200/50'} 
+      dark:from-gray-800 dark:via-purple-900/30 dark:to-cyan-900/30 dark:border-purple-700/50 rounded-2xl shadow-xl backdrop-blur-sm hover:shadow-2xl transition-all duration-500 group overflow-hidden relative`}
       {/* Sold Out Overlay */}
       {channelData.soldOut && (
         <div className="absolute inset-0 bg-gradient-to-br from-red-500/95 to-orange-500/95 backdrop-blur-sm z-20 flex items-center justify-center rounded-2xl">
@@ -327,7 +336,7 @@ export function ChannelCard({ channel, onBuyNow }: ChannelCardProps) {
         <img
           src={channelData.thumbnail || 'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=400&h=200&fit=crop'}
           alt={channelData.title}
-          className="w-full h-40 object-cover transition-transform duration-700 group-hover:scale-110"
+          className="w-full h-48 object-cover transition-transform duration-700 group-hover:scale-110"
         />
 
         {/* Gradient Overlay */}
@@ -370,7 +379,18 @@ export function ChannelCard({ channel, onBuyNow }: ChannelCardProps) {
           <div className="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400">
             <User className="w-3 h-3" />
             <span>By: {channelData.seller || 'Unknown'}</span>
+            {channelData.bonusBadge && (
+              <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-1 py-0 text-xs ml-1">
+                PRO SELLER
+              </Badge>
+            )}
           </div>
+          {channelData.bonusBadge && (
+            <div className="mt-1 text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
+              <Award className="w-3 h-3" />
+              <span>This person is 100% legit and trusted - received Admin Badge 😎</span>
+            </div>
+          )}
         </div>
 
         {/* Description */}
@@ -447,11 +467,11 @@ export function ChannelCard({ channel, onBuyNow }: ChannelCardProps) {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setShowCommentDialog(true)}
+              onClick={() => setShowCommentsView(true)}
               className="flex-1 border-blue-200 hover:bg-blue-50 dark:border-blue-700 dark:hover:bg-blue-900/30 transition-all duration-300 text-xs"
             >
               <MessageCircle className="w-3 h-3 mr-1" />
-              Comment
+              {commentCount}
             </Button>
             <Button
               variant="outline"
@@ -482,7 +502,68 @@ export function ChannelCard({ channel, onBuyNow }: ChannelCardProps) {
         </div>
       </div>
 
-      {/* Comment Dialog */}
+      {/* Comments View Dialog */}
+      <Dialog open={showCommentsView} onOpenChange={setShowCommentsView}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <MessageCircle className="w-5 h-5" />
+              Comments ({commentCount})
+            </DialogTitle>
+            <DialogDescription>
+              What people are saying about this channel
+            </DialogDescription>
+          </DialogHeader>
+          
+          {/* Comments List */}
+          <div className="flex-1 overflow-y-auto space-y-3 pr-2">
+            {comments.map((comment) => (
+              <div key={comment.id} className="flex gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0">
+                  {comment.avatar}
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-semibold text-sm">{comment.user}</span>
+                    <span className="text-xs text-gray-500">{comment.timestamp}</span>
+                  </div>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">{comment.text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Add Comment Section */}
+          <div className="border-t pt-4 mt-4">
+            <div className="flex gap-2">
+              <Textarea
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder="Write your comment here..."
+                className="flex-1 min-h-[60px] resize-none"
+              />
+              <Button 
+                onClick={handleComment}
+                disabled={!comment.trim()}
+                className="self-end"
+              >
+                <Send className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              onClick={() => setShowCommentsView(false)}
+              variant="outline"
+            >
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Comment Dialog */}
       <Dialog open={showCommentDialog} onOpenChange={setShowCommentDialog}>
         <DialogContent className="max-w-md">
           <DialogHeader>
