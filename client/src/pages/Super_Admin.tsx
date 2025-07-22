@@ -126,6 +126,7 @@ export default function SuperAdmin() {
       });
       queryClient.invalidateQueries({ queryKey: ['/api/admin/channels'] });
       queryClient.invalidateQueries({ queryKey: ['/api/admin/channels/pending'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/courses'] });
     }
   });
 
@@ -146,6 +147,8 @@ export default function SuperAdmin() {
         description: "Channel has been rejected with reason",
       });
       queryClient.invalidateQueries({ queryKey: ['/api/admin/channels'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/channels/pending'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/courses'] });
       setRejectionReason("");
     }
   });
@@ -475,7 +478,7 @@ export default function SuperAdmin() {
                               </span>
                             </div>
                           </div>
-                          <div className="text-right">
+                          <div className="text-right space-y-2">
                             <Badge 
                               className={
                                 channel.status === 'active' && channel.approvalStatus === 'approved'
@@ -487,19 +490,39 @@ export default function SuperAdmin() {
                             >
                               {channel.approvalStatus || channel.status}
                             </Badge>
+                            
+                            {/* Show additional status badges */}
+                            {channel.soldOut && (
+                              <Badge className="bg-red-600 text-white block">
+                                🔴 SOLD OUT
+                              </Badge>
+                            )}
+                            
+                            {channel.bonusBadge && (
+                              <Badge className="bg-yellow-500 text-white block">
+                                🏆 {channel.badgeText || "FEATURED"}
+                              </Badge>
+                            )}
+                            
+                            {channel.blocked && (
+                              <Badge className="bg-gray-600 text-white block">
+                                🚫 BLOCKED
+                              </Badge>
+                            )}
                           </div>
                         </div>
                         
-                        <div className="flex gap-2 mt-4">
-                          {channel.status === 'pending' && (
+                        <div className="flex flex-wrap gap-2 mt-4">
+                          {(channel.status === 'pending' || channel.approvalStatus === 'pending') && (
                             <>
                               <Button
                                 size="sm"
                                 onClick={() => approveMutation.mutate(channel.id)}
                                 className="bg-green-500 hover:bg-green-600"
+                                disabled={approveMutation.isPending}
                               >
                                 <CheckCircle className="w-4 h-4 mr-1" />
-                                Approve
+                                {approveMutation.isPending ? 'Approving...' : 'Approve'}
                               </Button>
                               <Dialog>
                                 <DialogTrigger asChild>
@@ -587,6 +610,15 @@ export default function SuperAdmin() {
                               </DialogFooter>
                             </DialogContent>
                           </Dialog>
+                          
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => deleteMutation.mutate(channel.id)}
+                          >
+                            <Trash2 className="w-4 h-4 mr-1" />
+                            Delete
+                          </Button>
                           
                           <Button
                             size="sm"
