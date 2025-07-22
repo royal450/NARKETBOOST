@@ -16,6 +16,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Channels API (alias for courses)
+  app.get("/api/channels", async (req, res) => {
+    try {
+      const channels = await storage.getCourses();
+      const activeChannels = channels.filter(channel => channel.status === 'active' && channel.approvalStatus === 'approved');
+      res.json(activeChannels);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch channels" });
+    }
+  });
+
+  app.post("/api/channels", async (req, res) => {
+    try {
+      const channelData = {
+        ...req.body,
+        status: 'pending',
+        approvalStatus: 'pending',
+        createdAt: new Date()
+      };
+      
+      const channel = await storage.createCourse(channelData);
+      res.json(channel);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create channel" });
+    }
+  });
+
   app.post("/api/courses", async (req, res) => {
     try {
       const serviceData = {

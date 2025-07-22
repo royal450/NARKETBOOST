@@ -3,6 +3,8 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { AuthProvider } from "@/hooks/use-auth";
 import { Toaster } from "@/components/ui/toaster";
+import { lazy, Suspense, useEffect } from "react";
+import { useAuth } from "@/hooks/use-auth";
 import Dashboard from "@/pages/dashboard";
 import DashboardAbroad from "@/pages/dashboard-abroad";
 import Login from "@/pages/login";
@@ -11,14 +13,10 @@ import Payment from "@/pages/payment";
 import Profile from "@/pages/profile";
 import Promotion from "@/pages/promotion";
 import AdminPanel from "@/pages/admin";
-// Import lazy after all regular imports
-import { lazy, Suspense } from "react";
 import CreateCourse from "@/pages/create-course";
 import MyCourses from "@/pages/my-courses";
 import Referral from "@/pages/referral";
 import NotFound from "@/pages/not-found";
-import { useAuth } from "@/hooks/use-auth";
-import { useEffect } from "react";
 import Withdrawal from "@/pages/withdrawal";
 
 // Lazy loaded channel pages
@@ -246,6 +244,11 @@ export default function App() {
           </Suspense>
         </Route>
         <Route path="/submit-channel">
+          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
+            <ProtectedRoute component={EnhancedChannelSubmission} />
+          </Suspense>
+        </Route>
+        <Route path="/enhanced-channel-submission">
           <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
             <ProtectedRoute component={EnhancedChannelSubmission} />
           </Suspense>
