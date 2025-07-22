@@ -6,7 +6,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button as Btn } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
@@ -20,6 +19,8 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useFirebaseServices, useFirebaseUsers, useFirebaseAdminStats } from "@/hooks/use-firebase-realtime";
+import { ref, onValue, off } from 'firebase/database';
+import { database } from '@/lib/firebase';
 import { adminOperations } from "@/lib/admin-firebase";
 import type { Channel, User, AdminStats } from "@shared/schema";
 
@@ -141,11 +142,40 @@ export default function SuperAdmin() {
     }
   };
 
-  // Data fetching
-  // Use Firebase realtime data
+  // Data fetching - Admin-specific that shows ALL services
   const { adminStats, loading: loadingStats } = useFirebaseAdminStats();
-  const { services: allChannels = [], loading: loadingChannels } = useFirebaseServices();
   const { users = [] } = useFirebaseUsers();
+  
+  // Admin-specific services hook that shows ALL services (pending, approved, rejected)
+  const [allChannels, setAllChannels] = useState<any[]>([]);
+  const [loadingChannels, setLoadingChannels] = useState(true);
+  
+  useEffect(() => {
+    const servicesRef = ref(database, 'services');
+    
+    const unsubscribe = onValue(servicesRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const servicesArray = Object.entries(data).map(([id, service]: [string, any]) => ({
+          id,
+          ...service,
+          approvalStatus: service.approvalStatus || 'pending',
+          status: service.status || 'pending',
+          blocked: service.blocked || false,
+          soldOut: service.soldOut || false,
+          bonusBadge: service.bonusBadge || null
+        }));
+        setAllChannels(servicesArray);
+        console.log('🔥 Admin Panel - Total channels loaded:', servicesArray.length);
+        console.log('📝 Pending channels:', servicesArray.filter(s => s.approvalStatus === 'pending').length);
+      } else {
+        setAllChannels([]);
+      }
+      setLoadingChannels(false);
+    });
+
+    return () => off(servicesRef, 'value', unsubscribe);
+  }, []);
   
   // Filter pending channels
   const pendingChannels = allChannels.filter((channel: any) => 
@@ -166,65 +196,19 @@ export default function SuperAdmin() {
     }
   ]);
 
-  // REMOVED - Using direct Firebase functions instead
+  // REMOVED DUPLICATE - Using existing functions below
 
-  // REMOVED - Using direct Firebase functions instead
-
-  // Channel deletion mutation
-  const deleteMutation = useMutation({
-    mutationFn: async (channelId: number) => {
-      const response = await fetch(`/api/courses/${channelId}`, {
-        method: 'DELETE'
-      });
-      if (!response.ok) throw new Error('Failed to delete channel');
-      return response.json();
-    },
-    onSuccess: () => {
-      toast({
-        title: "🗑️ Channel Deleted",
-        description: "Channel has been permanently removed",
-      });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/channels'] });
-    }
-  });
-
-  // Channel block/unblock mutation
-  const blockMutation = useMutation({
-    mutationFn: async ({ channelId, reason, action }: { channelId: number; reason?: string; action: 'block' | 'unblock' }) => {
-      const url = `/api/courses/${channelId}/${action}`;
-      const response = await fetch(url, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: action === 'block' ? JSON.stringify({ reason }) : undefined
-      });
-      if (!response.ok) throw new Error(`Failed to ${action} channel`);
-      return response.json();
-    },
-    onSuccess: (_, variables) => {
-      toast({
-        title: variables.action === 'block' ? "🚫 Channel Blocked" : "✅ Channel Unblocked",
-        description: `Channel has been ${variables.action}ed successfully`,
-      });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/channels'] });
-    }
-  });
-
-  // Sold Out Handler
-  const handleSoldOut = async (channelId: number, soldOut: boolean) => {
+  // Sold Out Handler - Fixed for Firebase
+  const handleSoldOut = async (channelId: string, soldOut: boolean) => {
     try {
-      const endpoint = soldOut ? 'sold-out' : 'remove-sold-out';
-      await apiRequest(`/api/courses/${channelId}/${endpoint}`, {
-        method: 'PUT'
-      });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/channels'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/courses'] });
+      await adminOperations.updateServiceMarketing(channelId, { soldOut });
       toast({
         title: soldOut ? "Channel marked as sold out" : "Sold out removed",
         description: soldOut ? "🔴 Channel is now sold out" : "✅ Channel is available again"
       });
     } catch (error) {
       toast({
-        title: "Error",
+        title: "Error", 
         description: "Failed to update sold out status",
         variant: "destructive"
       });
@@ -232,24 +216,31 @@ export default function SuperAdmin() {
   };
 
   // Bonus Badge Handler
-  const handleBonusBadge = async (channelId: number, badgeText: string) => {
+  const handleBonusBadge = async (channelId: string, badgeText?: string) => {
     try {
-      await apiRequest(`/api/courses/${channelId}/bonus-badge`, {
-        method: 'PUT',
-        body: JSON.stringify({ badgeText, badgeType: 'custom' }),
-        headers: { 'Content-Type': 'application/json' }
-      });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/channels'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/courses'] });
+      if (badgeText) {
+        await adminOperations.updateServiceMarketing(channelId, { 
+          bonusBadge: badgeText,
+          badgeType: 'admin_special',
+          addedBy: 'Super Admin',
+          badgeAddedAt: new Date().toISOString()
+        });
+      } else {
+        await adminOperations.updateServiceMarketing(channelId, { 
+          bonusBadge: null,
+          badgeType: null,
+          addedBy: null,
+          badgeAddedAt: null
+        });
+      }
       toast({
-        title: "Bonus badge added",
-        description: `🏆 Badge "${badgeText}" added to channel`
+        title: badgeText ? "🏆 Badge Added" : "✅ Badge Removed", 
+        description: badgeText ? `Added: ${badgeText}` : "Badge removed successfully"
       });
-      setBonusBadgeText("🔥 HOT DEAL");
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to add bonus badge",
+        description: "Failed to update badge",
         variant: "destructive"
       });
     }
@@ -534,12 +525,11 @@ export default function SuperAdmin() {
                             <>
                               <Button
                                 size="sm"
-                                onClick={() => approveMutation.mutate(channel.id)}
+                                onClick={() => handleApproveService(channel.id)}
                                 className="bg-green-500 hover:bg-green-600"
-                                disabled={approveMutation.isPending}
                               >
                                 <CheckCircle className="w-4 h-4 mr-1" />
-                                {approveMutation.isPending ? 'Approving...' : 'Approve'}
+                                Approve
                               </Button>
                               <Dialog>
                                 <DialogTrigger asChild>
@@ -562,10 +552,10 @@ export default function SuperAdmin() {
                                   />
                                   <DialogFooter>
                                     <Button
-                                      onClick={() => rejectMutation.mutate({
-                                        channelId: channel.id,
-                                        reason: rejectionReason
-                                      })}
+                                      onClick={() => {
+                                        handleRejectService(channel.id, rejectionReason);
+                                        setRejectionReason("");
+                                      }}
                                     >
                                       Confirm Rejection
                                     </Button>
@@ -638,10 +628,7 @@ export default function SuperAdmin() {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => channel.blocked 
-                              ? blockMutation.mutate({ channelId: channel.id, action: 'unblock' })
-                              : blockMutation.mutate({ channelId: channel.id, reason: 'Admin action', action: 'block' })
-                            }
+                            onClick={() => handleBlockService(channel.id, !channel.blocked, 'Admin action')}
                           >
                             {channel.blocked ? <Eye className="w-4 h-4 mr-1" /> : <EyeOff className="w-4 h-4 mr-1" />}
                             {channel.blocked ? 'Unblock' : 'Block'}
@@ -713,16 +700,7 @@ export default function SuperAdmin() {
                           <Button
                             size="sm"
                             variant="destructive"
-                            onClick={() => deleteMutation.mutate(channel.id)}
-                          >
-                            <Trash2 className="w-4 h-4 mr-1" />
-                            Delete
-                          </Button>
-
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => deleteMutation.mutate(channel.id)}
+                            onClick={() => handleDeleteService(channel.id)}
                           >
                             <Trash2 className="w-4 h-4 mr-1" />
                             Delete
@@ -754,17 +732,7 @@ export default function SuperAdmin() {
                             size="sm" 
                             variant="outline"
                             className={channel.soldOut ? "bg-red-100" : ""}
-                            onClick={() => {
-                              const action = channel.soldOut ? 'remove-sold-out' : 'sold-out';
-                              fetch(`/api/courses/${channel.id}/${action}`, {
-                                method: 'PUT'
-                              }).then(() => {
-                                toast({ 
-                                  title: channel.soldOut ? "✅ Sold Out Removed" : "🔴 Marked as Sold Out" 
-                                });
-                                queryClient.invalidateQueries({ queryKey: ['/api/admin/channels'] });
-                              });
-                            }}
+                            onClick={() => handleSoldOut(channel.id, !channel.soldOut)}
                           >
                             <Award className="w-4 h-4 mr-1" />
                             {channel.soldOut ? 'Remove Sold Out' : 'Mark Sold Out'}
@@ -776,23 +744,11 @@ export default function SuperAdmin() {
                             className={channel.bonusBadge ? "bg-yellow-100" : ""}
                             onClick={() => {
                               if (channel.bonusBadge) {
-                                fetch(`/api/courses/${channel.id}/remove-bonus-badge`, {
-                                  method: 'PUT'
-                                }).then(() => {
-                                  toast({ title: "✅ Bonus Badge Removed" });
-                                  queryClient.invalidateQueries({ queryKey: ['/api/admin/channels'] });
-                                });
+                                handleBonusBadge(channel.id);
                               } else {
                                 const badgeText = prompt("Enter badge text:", "🔥 HOT");
                                 if (badgeText) {
-                                  fetch(`/api/courses/${channel.id}/bonus-badge`, {
-                                    method: 'PUT',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ badgeText, badgeType: "hot" })
-                                  }).then(() => {
-                                    toast({ title: "✅ Bonus Badge Added" });
-                                    queryClient.invalidateQueries({ queryKey: ['/api/admin/channels'] });
-                                  });
+                                  handleBonusBadge(channel.id, badgeText);
                                 }
                               }
                             }}

@@ -48,10 +48,9 @@ export function useFirebaseRealtime() {
                   ...service,
                   ...marketingElements
                 };
-              }).filter((service: any) => {
-                // Show only approved/active services that are not blocked
-                return (service.approvalStatus === 'approved' || service.status === 'active') && !service.blocked;
               });
+              // For dashboard, filter only approved and active services
+              // For admin panel, show ALL services regardless of status
               setServices(servicesArray);
             } else {
               setServices([]);
