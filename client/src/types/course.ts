@@ -32,6 +32,15 @@ export interface Service {
   serviceType?: string;
   deliveryTime?: string;
   bundleContent?: string[];
+  views?: number;
+  blocked?: boolean;
+  blockReason?: string;
+  commission?: number;
+  approvalStatus?: string;
+  rejectionReason?: string;
+  sellerId?: number;
+  approvedAt?: string;
+  approvedBy?: string;
 }
 
 export interface UserStats {

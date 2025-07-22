@@ -54,36 +54,98 @@ export class MemStorage implements IStorage {
   }
   
   private initializeSampleData() {
-    // Add sample pending course
-    const sampleCourse: Channel = {
-      id: 1,
-      title: "Premium Instagram Marketing Course",
-      description: "Learn advanced Instagram marketing strategies to grow your business",
-      price: 2999,
-      fakePrice: 4999,
-      discount: 40,
-      category: "marketing",
-      thumbnail: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=300&fit=crop",
-      seller: "Marketing Expert",
-      sellerId: 1,
-      likes: 25,
-      comments: 8,
-      sales: 0,
-      blocked: false,
-      blockReason: null,
-      commission: 30,
-      status: "pending",
-      approvalStatus: "pending",
-      rejectionReason: null,
-      followerCount: 50000,
-      engagementRate: 4.5,
-      verificationStatus: "unverified",
-      platform: "instagram",
-      createdAt: new Date()
-    };
+    // Add sample services for testing
+    const sampleServices: Channel[] = [
+      {
+        id: 1,
+        title: "Monetized YouTube Channel - Tech Reviews",
+        description: "Established tech review channel with 250K subscribers, monetized, verified, and earning $2K/month",
+        price: 45000,
+        fakePrice: 75000,
+        discount: 40,
+        category: "youtube",
+        thumbnail: "https://images.unsplash.com/photo-1611162616475-46b635cb6868?w=400&h=300&fit=crop",
+        seller: "TechChannelPro",
+        sellerId: 1,
+        likes: 125,
+        comments: 28,
+        sales: 0,
+        blocked: false,
+        blockReason: null,
+        commission: 30,
+        status: "active",
+        approvalStatus: "approved",
+        rejectionReason: null,
+        followerCount: 250000,
+        engagementRate: 8.5,
+        verificationStatus: "verified",
+        platform: "youtube",
+        createdAt: new Date(),
+        approvedAt: new Date(),
+        approvedBy: "admin"
+      },
+      {
+        id: 2,
+        title: "Instagram Profile - Fashion & Lifestyle",
+        description: "Instagram account with 150K followers, high engagement, perfect for fashion brands",
+        price: 25000,
+        fakePrice: 40000,
+        discount: 37,
+        category: "instagram",
+        thumbnail: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&h=300&fit=crop",
+        seller: "SocialGrowth",
+        sellerId: 2,
+        likes: 89,
+        comments: 15,
+        sales: 0,
+        blocked: false,
+        blockReason: null,
+        commission: 30,
+        status: "active",
+        approvalStatus: "approved",
+        rejectionReason: null,
+        followerCount: 150000,
+        engagementRate: 6.2,
+        verificationStatus: "verified",
+        platform: "instagram",
+        createdAt: new Date(),
+        approvedAt: new Date(),
+        approvedBy: "admin"
+      },
+      {
+        id: 3,
+        title: "Discord Server Bundle - Gaming Community",
+        description: "Active gaming Discord server with 50K members, multiple channels, bots configured",
+        price: 15000,
+        fakePrice: 25000,
+        discount: 40,
+        category: "discord",
+        thumbnail: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400&h=300&fit=crop",
+        seller: "GameMaster",
+        sellerId: 3,
+        likes: 67,
+        comments: 12,
+        sales: 0,
+        blocked: false,
+        blockReason: null,
+        commission: 30,
+        status: "active",
+        approvalStatus: "approved",
+        rejectionReason: null,
+        followerCount: 50000,
+        engagementRate: 15.0,
+        verificationStatus: "verified",
+        platform: "discord",
+        createdAt: new Date(),
+        approvedAt: new Date(),
+        approvedBy: "admin"
+      }
+    ];
     
-    this.courses.set("1", sampleCourse);
-    this.currentCourseId = 2;
+    sampleServices.forEach(service => {
+      this.courses.set(service.id.toString(), service);
+    });
+    this.currentCourseId = 4;
   }
 
   async getUser(id: number): Promise<User | undefined> {

@@ -4,42 +4,42 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Course Management APIs
+  // Services Management APIs
   app.get("/api/courses", async (req, res) => {
     try {
-      // Get only active courses for dashboard
-      const courses = await storage.getCourses();
-      const activeCourses = courses.filter(course => course.status === 'active');
-      res.json(activeCourses);
+      // Get only active services for dashboard
+      const services = await storage.getCourses();
+      const activeServices = services.filter(service => service.status === 'active' && service.approvalStatus === 'approved');
+      res.json(activeServices);
     } catch (error) {
-      res.status(500).json({ error: "Failed to fetch courses" });
+      res.status(500).json({ error: "Failed to fetch services" });
     }
   });
 
   app.post("/api/courses", async (req, res) => {
     try {
-      const courseData = {
+      const serviceData = {
         ...req.body,
-        status: 'pending_review',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        status: 'pending',
+        approvalStatus: 'pending',
+        createdAt: new Date()
       };
       
-      const course = await storage.createCourse(courseData);
-      res.json(course);
+      const service = await storage.createCourse(serviceData);
+      res.json(service);
     } catch (error) {
-      res.status(500).json({ error: "Failed to create course" });
+      res.status(500).json({ error: "Failed to create service" });
     }
   });
 
-  // User Course Management
+  // User Services Management
   app.get("/api/users/:userId/courses", async (req, res) => {
     try {
       const { userId } = req.params;
-      const courses = await storage.getUserCourses(userId);
-      res.json(courses);
+      const services = await storage.getUserCourses(userId);
+      res.json(services);
     } catch (error) {
-      res.status(500).json({ error: "Failed to fetch user courses" });
+      res.status(500).json({ error: "Failed to fetch user services" });
     }
   });
 
