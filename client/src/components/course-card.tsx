@@ -304,15 +304,17 @@ export function ChannelCard({ channel, onBuyNow }: ChannelCardProps) {
     <div className={`${channelData.bonusBadge 
       ? 'bg-gradient-to-br from-yellow-50 via-amber-50/80 to-orange-50/60 border-2 border-yellow-300/60 shadow-2xl shadow-yellow-200/40' 
       : 'bg-gradient-to-br from-white via-purple-50/30 to-cyan-50/30 border border-purple-200/50'} 
-      dark:from-gray-800 dark:via-purple-900/30 dark:to-cyan-900/30 dark:border-purple-700/50 rounded-2xl shadow-xl backdrop-blur-sm hover:shadow-2xl transition-all duration-500 group overflow-hidden relative`}>
-      {/* Sold Out Overlay */}
+      dark:from-gray-800 dark:via-purple-900/30 dark:to-cyan-900/30 dark:border-purple-700/50 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 group overflow-hidden relative`}>
+      {/* Sold Out Overlay - Light Green with Positive Vibes */}
       {channelData.soldOut && (
-        <div className="absolute inset-0 bg-gradient-to-br from-red-500/95 to-orange-500/95 backdrop-blur-sm z-20 flex items-center justify-center rounded-2xl">
+        <div className="absolute inset-0 bg-gradient-to-br from-green-400/90 to-emerald-500/90 z-20 flex items-center justify-center rounded-2xl">
           <div className="text-center text-white p-4">
-            <div className="text-3xl mb-2">🔴</div>
-            <h3 className="text-xl font-bold mb-1">SOLD OUT</h3>
-            <p className="text-red-100 text-sm mb-3">This service is sold out 😎</p>
-            <p className="text-red-200 text-xs">Please explore other services 😎</p>
+            <div className="text-3xl mb-2">✅</div>
+            <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-1 rounded-full text-lg font-bold mb-2">
+              SOLD OUT
+            </div>
+            <p className="text-green-100 text-sm mb-3">This service is sold out 😎</p>
+            <p className="text-green-200 text-xs">Please explore other amazing services 😎</p>
             <Button 
               disabled 
               className="mt-3 bg-gray-500 cursor-not-allowed text-sm py-2"
@@ -414,21 +416,21 @@ export function ChannelCard({ channel, onBuyNow }: ChannelCardProps) {
           </div>
         </div>
 
-        {/* Pricing - Flex Direction */}
+        {/* Pricing - Attractive Flex Direction */}
         <div className="space-y-2">
           {channelData.fakePrice && channelData.fakePrice > channelData.price ? (
-            <div className="flex flex-col space-y-1">
-              <div className="flex items-center justify-between">
-                <span className="text-xl font-bold text-green-600 dark:text-green-400">₹{channelData.price.toLocaleString()}</span>
-                <span className="text-sm text-gray-500 line-through">₹{channelData.fakePrice.toLocaleString()}</span>
-              </div>
-              <div className="text-xs text-green-600 dark:text-green-400 font-medium">
-                Save ₹{(channelData.fakePrice - channelData.price).toLocaleString()} ({discountPercentage}% OFF)
-              </div>
+            <div className="flex items-center gap-3">
+              <span className="text-2xl font-bold text-green-600 dark:text-green-400">₹{channelData.price.toLocaleString()}</span>
+              <span className="text-lg font-bold text-red-500 line-through decoration-red-500 decoration-2 bg-red-50 px-2 py-1 rounded">₹{channelData.fakePrice.toLocaleString()}</span>
             </div>
           ) : (
             <div className="flex justify-between items-center">
-              <span className="text-xl font-bold text-gray-900 dark:text-white">₹{channelData.price.toLocaleString()}</span>
+              <span className="text-2xl font-bold text-green-600 dark:text-green-400">₹{channelData.price.toLocaleString()}</span>
+            </div>
+          )}
+          {channelData.fakePrice && channelData.fakePrice > channelData.price && (
+            <div className="text-xs text-green-600 dark:text-green-400 font-medium">
+              💰 Save ₹{(channelData.fakePrice - channelData.price).toLocaleString()} ({discountPercentage}% OFF)
             </div>
           )}
         </div>
@@ -502,66 +504,65 @@ export function ChannelCard({ channel, onBuyNow }: ChannelCardProps) {
         </div>
       </div>
 
-      {/* Comments View Dialog */}
-      <Dialog open={showCommentsView} onOpenChange={setShowCommentsView}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <MessageCircle className="w-5 h-5" />
-              Comments ({commentCount})
-            </DialogTitle>
-            <DialogDescription>
-              What people are saying about this channel
-            </DialogDescription>
-          </DialogHeader>
-          
-          {/* Comments List */}
-          <div className="flex-1 overflow-y-auto space-y-3 pr-2">
-            {comments.map((comment) => (
-              <div key={comment.id} className="flex gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0">
-                  {comment.avatar}
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-semibold text-sm">{comment.user}</span>
-                    <span className="text-xs text-gray-500">{comment.timestamp}</span>
-                  </div>
-                  <p className="text-sm text-gray-700 dark:text-gray-300">{comment.text}</p>
-                </div>
+      {/* Comments View - Integrated Card Modal */}
+      {showCommentsView && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden flex flex-col">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-4 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <MessageCircle className="w-5 h-5" />
+                <h3 className="text-lg font-bold">Comments ({commentCount})</h3>
               </div>
-            ))}
-          </div>
-
-          {/* Add Comment Section */}
-          <div className="border-t pt-4 mt-4">
-            <div className="flex gap-2">
-              <Textarea
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                placeholder="Write your comment here..."
-                className="flex-1 min-h-[60px] resize-none"
-              />
-              <Button 
-                onClick={handleComment}
-                disabled={!comment.trim()}
-                className="self-end"
+              <Button
+                onClick={() => setShowCommentsView(false)}
+                variant="ghost"
+                size="sm"
+                className="text-white hover:bg-white/20"
               >
-                <Send className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </Button>
             </div>
-          </div>
+            
+            {/* Comments List with Scroll */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-3 max-h-[50vh]">
+              {comments.map((comment) => (
+                <div key={comment.id} className="flex gap-3 p-3 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/30 dark:to-blue-900/30 rounded-lg border border-purple-200/50 dark:border-purple-700/50">
+                  <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0">
+                    {comment.avatar}
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-semibold text-sm text-gray-900 dark:text-white">{comment.user}</span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">{comment.timestamp}</span>
+                    </div>
+                    <p className="text-sm text-gray-700 dark:text-gray-300">{comment.text}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
 
-          <DialogFooter>
-            <Button
-              onClick={() => setShowCommentsView(false)}
-              variant="outline"
-            >
-              Close
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            {/* Add Comment Section */}
+            <div className="border-t border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-900/50">
+              <div className="flex gap-2">
+                <Textarea
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder="Write your comment here... 💬"
+                  className="flex-1 min-h-[60px] resize-none border-purple-200 dark:border-purple-700 focus:border-purple-500"
+                />
+                <Button 
+                  onClick={handleComment}
+                  disabled={!comment.trim()}
+                  className="self-end bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                >
+                  <Send className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Add Comment Dialog */}
       <Dialog open={showCommentDialog} onOpenChange={setShowCommentDialog}>
