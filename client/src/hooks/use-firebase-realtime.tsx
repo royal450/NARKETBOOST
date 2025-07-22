@@ -95,6 +95,7 @@ export function useFirebaseRealtime() {
 
     const createService = async (serviceData: any) => {
       try {
+        console.log('Creating service with data:', serviceData);
         const servicesRef = ref(database, 'services');
         const newServiceRef = push(servicesRef);
         
@@ -105,13 +106,17 @@ export function useFirebaseRealtime() {
           approvalStatus: 'pending',
           status: 'pending',
           blocked: false,
-          likes: 0,
-          comments: 0,
-          views: Math.floor(Math.random() * 1000) + 100, // Initial fake views
-          rating: (Math.random() * 1 + 4).toFixed(1), // 4.0-5.0 rating
+          likes: serviceData.likes || Math.floor(Math.random() * 50000) + 10000,
+          comments: serviceData.comments || Math.floor(Math.random() * 5000) + 1000,
+          views: serviceData.views || Math.floor(Math.random() * 900000) + 100000,
+          rating: serviceData.rating || (Math.random() * 1 + 4).toFixed(1),
+          soldCount: serviceData.soldCount || 0,
+          engagementRate: serviceData.engagementRate || (Math.random() * 8 + 2).toFixed(1),
+          followerCount: serviceData.followersCount || serviceData.followerCount || Math.floor(Math.random() * 500000) + 50000
         };
 
         await set(newServiceRef, serviceWithTimestamp);
+        console.log('Service created successfully in Firebase:', newServiceRef.key);
         return { id: newServiceRef.key, ...serviceWithTimestamp };
       } catch (error) {
         console.error('Error creating service:', error);

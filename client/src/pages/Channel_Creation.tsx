@@ -93,6 +93,7 @@ const getAutoThumbnail = (category: string, serviceType: string) => {
 export default function ChannelCreation() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const [autoThumbnail, setAutoThumbnail] = useState<string>('');
   const [screenshots, setScreenshots] = useState<string[]>([]);
   const [showCustomCategory, setShowCustomCategory] = useState(false);
@@ -146,50 +147,56 @@ export default function ChannelCreation() {
     setShowCustomService(selectedServiceType === 'other');
   }, [selectedServiceType]);
 
-  // Submit mutation
+  // Fixed Firebase submission mutation
   const submitMutation = useMutation({
     mutationFn: async (data: ChannelSubmissionForm) => {
-      const submissionData = {
-        ...data,
-        thumbnail: autoThumbnail,
-        platform: data.serviceType,
-        followerCount: data.followersCount,
-        status: 'pending',
-        approvalStatus: 'pending',
+      if (!user) throw new Error('Please login to submit a channel');
+      
+      const serviceData = {
+        title: data.title,
+        description: data.description,
         price: data.realPrice,
         fakePrice: data.marketingPrice || data.realPrice * 3,
         category: data.category === 'Custom Category' ? data.customCategory : data.category,
-        seller: 'User', // This should come from auth context
+        serviceType: data.serviceType === 'other' ? data.customServiceType : data.serviceType,
+        serviceUrl: data.serviceUrl,
+        serviceName: data.serviceName,
+        followersCount: data.followersCount,
+        monetizationStatus: data.monetizationStatus,
+        reputation: data.reputation,
+        trustedLevel: data.trustedLevel,
+        screenshots: screenshots,
+        thumbnail: autoThumbnail,
+        seller: user.displayName || user.email || 'Anonymous',
+        instructorId: user.uid,
+        approvalStatus: 'pending',
+        status: 'pending',
+        blocked: false,
         likes: Math.floor(Math.random() * 50000) + 10000,
         comments: Math.floor(Math.random() * 5000) + 1000,
-        views: Math.floor(Math.random() * 900000) + 100000, // 100K - 1M fake views
+        views: Math.floor(Math.random() * 900000) + 100000,
+        rating: (Math.random() * 1 + 4).toFixed(1),
+        soldCount: 0,
+        engagementRate: (Math.random() * 8 + 2).toFixed(1)
       };
-
-      const response = await fetch('/api/channels', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(submissionData),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to submit channel');
-      }
-
-      return response.json();
+      
+      console.log('Submitting to Firebase:', serviceData);
+      return await createService(serviceData);
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
+      console.log('Firebase submission successful:', result);
       toast({
         title: "🎉 Channel Submitted Successfully!",
         description: "Your channel is now under review. You'll be notified once it's approved.",
       });
-
       // Reset form
       window.location.reload();
     },
-    onError: (error) => {
+    onError: (error: any) => {
+      console.error('Firebase submission error:', error);
       toast({
         title: "❌ Submission Failed",
-        description: "Please try again later or contact support.",
+        description: error?.message || "Please try again later or contact support.",
         variant: "destructive",
       });
     }

@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useFirebaseServices, useFirebaseUsers, useFirebaseAdminStats } from "@/hooks/use-firebase-realtime";
+import { approveServiceInFirebase, rejectServiceInFirebase, toggleServiceBlock, updateServiceMarketing } from "@/lib/firebase-operations";
 import type { Channel, User, AdminStats } from "@shared/schema";
 
 // Complex admin password
@@ -75,21 +76,53 @@ export default function SuperAdmin() {
     }
   };
 
-  // Helper function for API requests
-  const apiRequest = async (url: string, options: RequestInit = {}) => {
-    const response = await fetch(url, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-      }
-    });
-
-    if (!response.ok) {
-      throw new Error(`API request failed: ${response.statusText}`);
+  // Admin actions for Firebase
+  const handleApproveService = async (serviceId: string) => {
+    try {
+      await approveServiceInFirebase(serviceId, 'Approved by super admin');
+      toast({
+        title: "✅ Service Approved!",
+        description: "Service has been approved and is now live on the platform.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "❌ Approval Failed",
+        description: error?.message || "Failed to approve service",
+        variant: "destructive",
+      });
     }
+  };
 
-    return response.json();
+  const handleRejectService = async (serviceId: string, reason: string) => {
+    try {
+      await rejectServiceInFirebase(serviceId, reason, 'Rejected by super admin');
+      toast({
+        title: "❌ Service Rejected",
+        description: "Service has been rejected with the provided reason.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "❌ Rejection Failed", 
+        description: error?.message || "Failed to reject service",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleBlockService = async (serviceId: string, blocked: boolean, reason?: string) => {
+    try {
+      await toggleServiceBlock(serviceId, blocked, reason);
+      toast({
+        title: blocked ? "🚫 Service Blocked" : "✅ Service Unblocked",
+        description: `Service has been ${blocked ? 'blocked' : 'unblocked'} successfully.`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "❌ Action Failed",
+        description: error?.message || `Failed to ${blocked ? 'block' : 'unblock'} service`,
+        variant: "destructive",
+      });
+    }
   };
 
   // Data fetching
