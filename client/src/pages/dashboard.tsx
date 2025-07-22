@@ -29,7 +29,7 @@ import {
   Sparkles
 } from "lucide-react";
 import { Course } from "@/types/course";
-import { useCourses } from "@/hooks/use-courses";
+import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 
 // Dashboard will use Firebase data from useCourses hook
@@ -37,7 +37,12 @@ import { useAuth } from "@/hooks/use-auth";
 export default function Dashboard() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
-  const { courses, loading } = useCourses();
+  
+  // Fetch active courses from backend API
+  const { data: courses = [], isLoading: loading } = useQuery({
+    queryKey: ["/api/courses"],
+    select: (data) => data || []
+  });
   const [filteredChannels, setFilteredChannels] = useState<Course[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedChannel, setSelectedChannel] = useState<Course | null>(null);
