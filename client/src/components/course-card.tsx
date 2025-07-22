@@ -2,10 +2,12 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Heart, MessageCircle, Share2, Star, X, Send, ShoppingCart, Eye, User, Users, TrendingUp } from "lucide-react";
+import { Heart, MessageCircle, Share2, Star, X, Send, ShoppingCart, Eye, User, Users, TrendingUp, Shield, Award, Zap } from "lucide-react";
 import { Channel } from "@/types/course";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
+import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface ChannelCardProps {
   channel: Channel;
@@ -36,11 +38,14 @@ export function ChannelCard({ channel, onBuyNow }: ChannelCardProps) {
   const [newComment, setNewComment] = useState("");
   const [comments, setComments] = useState<Comment[]>([]);
   const [commentCount, setCommentCount] = useState(0);
-  const [realTimeViews] = useState(channelData.views || Math.floor(Math.random() * 900000) + 100000);
+  const [realTimeViews] = useState(channelData.views || Math.floor(Math.random() * 9000) + 1000);
   const [realTimeSales] = useState(channelData.sales || 0);
   const [realTimeRating] = useState(channelData.rating || (Math.random() * 3.9 + 1.1).toFixed(1));
   const [followerCount] = useState(channelData.followerCount || Math.floor(Math.random() * 100000) + 10000);
   const [engagementRate] = useState(channelData.engagementRate || (Math.random() * 8 + 2).toFixed(1));
+  const [showCommentDialog, setShowCommentDialog] = useState(false);
+  const [comment, setComment] = useState("");
+
 
   // Realistic mixed names with 80% Indian names
   const generateRealisticComments = () => {
@@ -244,6 +249,27 @@ export function ChannelCard({ channel, onBuyNow }: ChannelCardProps) {
     });
   };
 
+    const handleComment = () => {
+    if (!comment.trim()) return;
+
+    const newCommentObj: Comment = {
+      id: Date.now().toString(),
+      user: user?.displayName || user?.email || "Anonymous",
+      text: comment,
+      timestamp: new Date(),
+      avatar: (user?.displayName || user?.email || "A").charAt(0).toUpperCase()
+    };
+
+    setComments(prev => [newCommentObj, ...prev]);
+    setComment("");
+    setShowCommentDialog(false);
+
+    toast({
+      title: "Comment Added! 💬",
+      description: "Your comment has been posted successfully",
+    });
+  };
+
   // Calculate automatic discount percentage if fake price exists
   const calculateDiscountPercentage = () => {
     if (channelData.fakePrice && channelData.fakePrice > channelData.price) {
@@ -268,164 +294,128 @@ export function ChannelCard({ channel, onBuyNow }: ChannelCardProps) {
     return views.toString();
   };
 
-  return (
-    <div className="bg-gradient-to-br from-white via-purple-50/30 to-cyan-50/30 dark:from-gray-800 dark:via-purple-900/30 dark:to-cyan-900/30 rounded-3xl shadow-2xl border border-purple-200/50 dark:border-purple-700/50 overflow-hidden animate-fadeInUp relative">
-
-      {/* Channel Image */}
-      <div className="relative overflow-hidden">
-        <img
-          src={channelData.thumbnail || "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=400&h=300&fit=crop"}
-          alt={channelData.title}
-          className="w-full h-52 object-cover"
-        />
-
-        {/* Discount Badge */}
-        {discountPercentage > 0 && (
-          <div className="absolute top-4 left-4">
-            <Badge className="bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 text-sm font-bold animate-pulse shadow-lg">
-              {discountPercentage}% OFF
-            </Badge>
+    return (
+    <div className="bg-gradient-to-br from-white via-purple-50/30 to-cyan-50/30 dark:from-gray-800 dark:via-purple-900/30 dark:to-cyan-900/30 rounded-2xl shadow-xl border border-purple-200/50 dark:border-purple-700/50 backdrop-blur-sm hover:shadow-2xl transition-all duration-500 group overflow-hidden relative">
+      {/* Sold Out Overlay */}
+      {channelData.soldOut && (
+        <div className="absolute inset-0 bg-gradient-to-br from-red-500/95 to-orange-500/95 backdrop-blur-sm z-20 flex items-center justify-center rounded-2xl">
+          <div className="text-center text-white p-4">
+            <div className="text-3xl mb-2">🔴</div>
+            <h3 className="text-xl font-bold mb-1">SOLD OUT</h3>
+            <p className="text-red-100 text-sm mb-3">This service is sold out 😎</p>
+            <p className="text-red-200 text-xs">Please explore other services 😎</p>
+            <Button 
+              disabled 
+              className="mt-3 bg-gray-500 cursor-not-allowed text-sm py-2"
+            >
+              Service Unavailable
+            </Button>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Platform Badge */}
-        <div className="absolute top-4 right-4">
-          <Badge className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-3 py-1 shadow-lg">
-            {channelData.platform || channelData.category}
+      {/* Discount Badge */}
+      {discountPercentage > 0 && (
+        <div className="absolute top-3 left-3 z-10">
+          <Badge className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-2 py-1 text-xs font-bold animate-pulse shadow-md">
+            {discountPercentage}% OFF
           </Badge>
         </div>
+      )}
 
-        {/* Sold Out Overlay */}
-        {channelData.soldOut && (
-          <div className="absolute inset-0 bg-gradient-to-br from-orange-500/80 via-red-500/80 to-red-600/80 backdrop-blur-sm flex items-center justify-center z-10">
-            <div className="text-center">
-              <Badge className="bg-gradient-to-r from-red-600 to-orange-600 text-white px-8 py-4 text-xl font-bold shadow-2xl animate-pulse border-2 border-white">
-                🔴 SOLD OUT 😎
-              </Badge>
-              <p className="text-white font-bold mt-2 text-sm">Service no longer available</p>
+      <div className="relative overflow-hidden">
+        <img
+          src={channelData.thumbnail || 'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=400&h=200&fit=crop'}
+          alt={channelData.title}
+          className="w-full h-40 object-cover transition-transform duration-700 group-hover:scale-110"
+        />
+
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+
+        {/* Live Stats Overlay */}
+        <div className="absolute bottom-2 left-2 right-2 text-white z-10">
+          <div className="flex justify-between items-center text-xs opacity-90">
+            <div className="flex items-center space-x-2">
+              <span className="flex items-center gap-1 bg-black/30 px-2 py-1 rounded-full backdrop-blur-sm">
+                <Heart className="w-3 h-3 text-red-400" />
+                {displayLikes}
+              </span>
+              <span className="flex items-center gap-1 bg-black/30 px-2 py-1 rounded-full backdrop-blur-sm">
+                <Eye className="w-3 h-3 text-blue-400" />
+                {formatViews(displayViews)}
+              </span>
+            </div>
+            <div className="flex items-center gap-1 bg-black/40 px-2 py-1 rounded-full backdrop-blur-sm">
+              <Star className="w-3 h-3 text-yellow-400 fill-current" />
+              <span className="text-xs font-medium">{finalRating}</span>
             </div>
           </div>
-        )}
-
-        {/* Bonus Badge */}
-        {channelData.bonusBadge && !channelData.soldOut && (
-          <div className="absolute bottom-4 left-4">
-            <div className="space-y-1">
-              <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 text-xs font-bold shadow-lg animate-bounce">
-                {channelData.badgeText || "🔥 HOT"}
-              </Badge>
-              <div className="text-xs text-white bg-black/50 px-2 py-1 rounded">
-                By: {channelData.badgeAddedBy === 'Admin' || channelData.badgeAddedBy === 'Super Admin' ? 'Admin' : channelData.seller}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Default Hot Badge if no bonus badge */}
-        {!channelData.bonusBadge && !channelData.soldOut && (
-          <div className="absolute bottom-4 left-4">
-            <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-1 text-xs font-bold shadow-lg animate-bounce">
-              🔥 HOT
-            </Badge>
-          </div>
-        )}
-
-        {/* Views Badge */}
-        <div className="absolute bottom-4 right-4">
-          <Badge className="bg-black/70 text-white px-3 py-1 text-xs font-medium shadow-lg">
-            {formatViews(displayViews)} views
-          </Badge>
         </div>
       </div>
 
-      {/* Channel Content */}
-      <div className="p-6 bg-gradient-to-b from-transparent to-gray-50/50 dark:to-gray-800/50">
-        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2">
-          {channelData.title}
-        </h3>
-
-        <div className="flex items-center mb-4 gap-3">
-          <div className="flex items-center bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-full">
-            <User className="w-4 h-4 text-purple-500 mr-2" />
-            <span className="text-sm text-gray-700 dark:text-gray-300">
-              Seller: <span 
-                className="font-medium text-purple-600 cursor-pointer hover:underline"
-                onClick={() => {
-                  if (channelData.sellerId) {
-                    window.open(`/user-profile/${channelData.sellerId}`, '_blank');
-                  }
-                }}
-              >
-                {channelData.seller}
-              </span>
-            </span>
+      <div className="p-4 space-y-3">
+        {/* Title with Badge */}
+        <div>
+          <div className="flex items-start gap-2 mb-1">
+            <h3 className="text-md font-bold text-gray-900 dark:text-white line-clamp-2 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors flex-1">
+              {channelData.title}
+            </h3>
+            {channelData.bonusBadge && (
+              <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-2 py-1 text-xs font-bold animate-pulse shadow-md border-0 shrink-0">
+                {channelData.badgeText || "🔥 HOT"}
+              </Badge>
+            )}
           </div>
-          <div className="flex items-center bg-blue-100 dark:bg-blue-900 px-3 py-1 rounded-full">
-            <Users className="w-4 h-4 text-blue-500 mr-2" />
-            <span className="text-sm text-blue-700 dark:text-blue-300 font-medium">
-              {(followerCount / 1000).toFixed(0)}K followers
-            </span>
-          </div>
-          <div className="flex items-center bg-green-100 dark:bg-green-900 px-3 py-1 rounded-full">
-            <TrendingUp className="w-4 h-4 text-green-500 mr-2" />
-            <span className="text-sm text-green-700 dark:text-green-300 font-medium">
-              {engagementRate}% engagement
-            </span>
+          <div className="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400">
+            <User className="w-3 h-3" />
+            <span>By: {channelData.seller || 'Unknown'}</span>
           </div>
         </div>
 
-        <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-3 leading-relaxed">
+        {/* Description */}
+        <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-2 leading-relaxed">
           {channelData.description}
         </p>
 
-        {/* Price Section - Fake Price for Marketing, Real Price Display */}
-        <div className={`flex items-center justify-between mb-4 ${channelData.soldOut ? 'opacity-60' : ''}`}>
-          <div className="flex flex-col space-y-2">
-            {/* Marketing/Fake Price Box */}
-            <div className="flex items-center space-x-2">
-              <div className={`${channelData.soldOut ? 'bg-orange-100 border-orange-300' : 'bg-red-100 border-red-300'} border px-3 py-1 rounded-lg`}>
-                <span className={`text-lg line-through font-medium ${channelData.soldOut ? 'text-orange-600' : 'text-red-600'}`}>₹{Math.floor((channelData.fakePrice || channelData.price * 2.5)).toLocaleString()}</span>
-              </div>
-              <div className={`${channelData.soldOut ? 'bg-orange-500' : 'bg-green-500'} text-white px-2 py-1 rounded text-xs font-medium`}>
-                {Math.floor(((((channelData.fakePrice || channelData.price * 2.5) - channelData.price) / (channelData.fakePrice || channelData.price * 2.5)) * 100))}% OFF
-              </div>
-            </div>
-            {/* Real Price */}
-            <div className="flex items-center space-x-2">
-              <span className={`text-2xl font-bold ${channelData.soldOut ? 'text-orange-600' : 'text-green-600'}`}>₹{Math.floor(channelData.price).toLocaleString()}</span>
-            </div>
+        {/* Stats Grid */}
+        <div className="grid grid-cols-3 gap-2 py-2 border-t border-b border-gray-200 dark:border-gray-700">
+          <div className="text-center">
+            <div className="text-sm font-bold text-purple-600 dark:text-purple-400">{displayLikes}</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">Likes</div>
           </div>
-          <div className="flex items-center space-x-1">
-            <Star className="w-4 h-4 text-yellow-500 fill-current" />
-            <span className="text-sm font-medium text-gray-700">{finalRating.toFixed(1)}</span>
+          <div className="text-center">
+            <div className="text-sm font-bold text-blue-600 dark:text-blue-400">{formatViews(displayViews)}</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">Views</div>
+          </div>
+          <div className="text-center">
+            <div className="text-sm font-bold text-green-600 dark:text-green-400">{displaySales}</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">Sales</div>
           </div>
         </div>
 
-        {/* Stats */}
-        <div className={`flex items-center justify-between text-sm mb-4 ${channelData.soldOut ? 'text-orange-600 opacity-70' : 'text-gray-600'}`}>
-          <div className="flex items-center space-x-4">
-            <span className="flex items-center">
-              <Heart className={`w-4 h-4 mr-1 ${channelData.soldOut ? 'text-orange-500' : ''}`} />
-              {displayLikes}
-            </span>
-            <span className="flex items-center">
-              <MessageCircle className={`w-4 h-4 mr-1 ${channelData.soldOut ? 'text-orange-500' : ''}`} />
-              {comments.length}
-            </span>
-            <span className="flex items-center">
-              <Eye className={`w-4 h-4 mr-1 ${channelData.soldOut ? 'text-orange-500' : ''}`} />
-              {formatViews(displayViews)}
-            </span>
-            <span className="flex items-center">
-              <ShoppingCart className={`w-4 h-4 mr-1 ${channelData.soldOut ? 'text-orange-500' : ''}`} />
-              {displaySales} transferred
-            </span>
-          </div>
+        {/* Pricing - Flex Direction */}
+        <div className="space-y-2">
+          {channelData.fakePrice && channelData.fakePrice > channelData.price ? (
+            <div className="flex flex-col space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="text-xl font-bold text-green-600 dark:text-green-400">₹{channelData.price.toLocaleString()}</span>
+                <span className="text-sm text-gray-500 line-through">₹{channelData.fakePrice.toLocaleString()}</span>
+              </div>
+              <div className="text-xs text-green-600 dark:text-green-400 font-medium">
+                Save ₹{(channelData.fakePrice - channelData.price).toLocaleString()} ({discountPercentage}% OFF)
+              </div>
+            </div>
+          ) : (
+            <div className="flex justify-between items-center">
+              <span className="text-xl font-bold text-gray-900 dark:text-white">₹{channelData.price.toLocaleString()}</span>
+            </div>
+          )}
         </div>
 
         {/* Action Buttons */}
-        <div className="space-y-3">
-          <Button
+        <div className="space-y-2 pt-2">
+          <Button 
             onClick={() => {
               if (channelData.soldOut) {
                 toast({
@@ -438,111 +428,90 @@ export function ChannelCard({ channel, onBuyNow }: ChannelCardProps) {
               onBuyNow(channelData);
             }}
             disabled={channelData.soldOut}
-            className={`w-full font-bold py-4 rounded-2xl shadow-2xl ${
-              channelData.soldOut 
-                ? 'bg-gradient-to-r from-orange-500 to-red-500 cursor-not-allowed opacity-80' 
-                : 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:via-purple-700 hover:to-pink-700'
-            } text-white transition-all duration-300`}
+            className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-2 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 text-sm"
           >
-            <div className="flex items-center justify-center">
-              <ShoppingCart className="w-5 h-5 mr-2" />
-              <span className="text-lg">
-                {channelData.soldOut ? 'SOLD OUT 😎' : `Purchase Channel - ₹${Math.floor(channelData.price).toLocaleString()}`}
-              </span>
-            </div>
+            <ShoppingCart className="w-4 h-4 mr-2" />
+            Buy Now - ₹{channelData.price.toLocaleString()}
           </Button>
 
-          <div className="flex space-x-2">
+          <div className="flex gap-2">
             <Button
+              variant="outline"
+              size="sm"
               onClick={handleLike}
+              className="flex-1 border-purple-200 hover:bg-purple-50 dark:border-purple-700 dark:hover:bg-purple-900/30 transition-all duration-300 text-xs"
+            >
+              <Heart className={`w-3 h-3 mr-1 ${isLiked ? 'fill-current text-red-500' : ''}`} />
+              {displayLikes}
+            </Button>
+            <Button
               variant="outline"
               size="sm"
-              className={`flex-1 transition-all duration-300 ${
-                isLiked ? 'bg-red-50 border-red-200 text-red-600' : 'hover:bg-red-50 hover:border-red-200 hover:text-red-600'
-              }`}
+              onClick={() => setShowCommentDialog(true)}
+              className="flex-1 border-blue-200 hover:bg-blue-50 dark:border-blue-700 dark:hover:bg-blue-900/30 transition-all duration-300 text-xs"
             >
-              <Heart className={`w-4 h-4 mr-1 ${isLiked ? 'fill-current' : ''}`} />
-              {isLiked ? 'Liked' : 'Like'}
+              <MessageCircle className="w-3 h-3 mr-1" />
+              Comment
             </Button>
-
             <Button
-              onClick={() => setShowComments(!showComments)}
               variant="outline"
               size="sm"
-              className="flex-1 hover:bg-blue-50 hover:border-blue-200 hover:text-blue-600 transition-all duration-300"
-            >
-              <MessageCircle className="w-4 h-4 mr-1" />
-              Comments ({comments.length})
-            </Button>
-
-            <Button
               onClick={handleShare}
-              variant="outline"
-              size="sm"
-              className="flex-1 hover:bg-green-50 hover:border-green-200 hover:text-green-600 transition-all duration-300"
+              className="flex-1 border-green-200 hover:bg-green-50 dark:border-green-700 dark:hover:bg-green-900/30 transition-all duration-300 text-xs"
             >
-              <Share2 className="w-4 h-4 mr-1" />
+              <Share2 className="w-3 h-3 mr-1" />
               Share
             </Button>
           </div>
         </div>
-      </div>
 
-      {/* Comments Section */}
-      {showComments && (
-        <div className="border-t border-gray-200 bg-gray-50 p-4 animate-slideDown">
-          <div className="flex items-center justify-between mb-4">
-            <h4 className="font-semibold text-gray-900">Comments ({comments.length})</h4>
-            <Button
-              onClick={() => setShowComments(false)}
-              variant="ghost"
-              size="sm"
-              className="text-gray-400 hover:text-gray-600"
-            >
-              <X className="w-4 h-4" />
-            </Button>
+        {/* Trust Indicators */}
+        <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 pt-2 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex items-center gap-1">
+            <Shield className="w-3 h-3" />
+            <span className="text-xs">Verified</span>
           </div>
-
-          {/* Add Comment */}
-          <div className="flex space-x-2 mb-4">
-            <Input
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              placeholder="Add a comment..."
-              className="flex-1"
-              onKeyPress={(e) => e.key === 'Enter' && handleAddComment()}
-            />
-            <Button
-              onClick={handleAddComment}
-              size="sm"
-              disabled={!newComment.trim()}
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              <Send className="w-4 h-4" />
-            </Button>
+          <div className="flex items-center gap-1">
+            <Award className="w-3 h-3" />
+            <span className="text-xs">Premium</span>
           </div>
-
-          {/* Comments List */}
-          <div className="space-y-3 max-h-64 overflow-y-auto">
-            {comments.map((comment) => (
-              <div key={comment.id} className="bg-white p-3 rounded-lg shadow-sm">
-                <div className="flex items-start space-x-3">
-                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
-                    {comment.avatar}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2 mb-1">
-                      <span className="font-medium text-gray-900 text-sm">{comment.user}</span>
-                      <span className="text-xs text-gray-500">{comment.timestamp}</span>
-                    </div>
-                    <p className="text-gray-700 text-sm">{comment.text}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
+          <div className="flex items-center gap-1">
+            <Zap className="w-3 h-3" />
+            <span className="text-xs">Instant</span>
           </div>
         </div>
-      )}
+      </div>
+
+      {/* Comment Dialog */}
+      <Dialog open={showCommentDialog} onOpenChange={setShowCommentDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add a Comment</DialogTitle>
+            <DialogDescription>
+              Share your thoughts about this channel
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Textarea
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="Write your comment here..."
+              className="min-h-[100px]"
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              onClick={() => setShowCommentDialog(false)}
+              variant="outline"
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleComment}>
+              Post Comment
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

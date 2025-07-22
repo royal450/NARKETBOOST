@@ -350,6 +350,11 @@ export class MemStorage implements IStorage {
     return userArray;
   }
 
+  // Alias method for getRealUsers
+  async getRealUsers(): Promise<User[]> {
+    return this.getUsers();
+  }
+
   async updateUser(userId: string, updates: any): Promise<User> {
     const user = this.users.get(parseInt(userId));
     if (!user) {
