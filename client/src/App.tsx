@@ -11,6 +11,7 @@ import Payment from "@/pages/payment";
 import Profile from "@/pages/profile";
 import Promotion from "@/pages/promotion";
 import AdminPanel from "@/pages/admin";
+import { lazy } from "react";
 const ChannelCreationModern = lazy(() => import("@/pages/channel-creation-modern"));
 const FullFeaturedAdmin = lazy(() => import("@/pages/full-featured-admin"));
 const ChannelShowCard = lazy(() => import("@/pages/channel-show-full-attractive-card"));
@@ -21,7 +22,6 @@ import Referral from "@/pages/referral";
 import NotFound from "@/pages/not-found";
 import { useAuth } from "@/hooks/use-auth";
 import { useEffect } from "react";
-import { lazy } from "react";
 import Withdrawal from "@/pages/withdrawal";
 
 function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
