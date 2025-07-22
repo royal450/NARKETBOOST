@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Upload, Megaphone, DollarSign, Info, AlertTriangle, Sparkles } from "lucide-react";
 import { useLocation } from "wouter";
 
-export default function ListChannel() {
+export default function ListService() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -24,7 +24,7 @@ export default function ListChannel() {
       <div className="min-h-screen bg-gradient-to-br from-purple-600 to-blue-700 flex items-center justify-center">
         <div className="text-center text-white">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-          <p>Please login to list your channel...</p>
+          <p>Please login to list your service...</p>
         </div>
       </div>
     );
@@ -38,15 +38,15 @@ export default function ListChannel() {
     platform: "",
     category: "",
     thumbnail: "",
-    channelLink: "",
+    serviceLink: "",
     followerCount: "",
     engagementRate: "",
-    niche: "lifestyle",
-    monetization: "yes",
+    serviceType: "channel",
+    deliveryTime: "1-3 days",
     tags: "",
     targetAudience: "",
     contentType: "",
-    analytics: "",
+    bundleContent: "",
   });
 
   const platforms = [
@@ -59,6 +59,9 @@ export default function ListChannel() {
     { id: "telegram", label: "Telegram Channel", image: "https://images.unsplash.com/photo-1611162617213-7d7a39e9b377?w=400&h=300&fit=crop" },
     { id: "discord", label: "Discord Server", image: "https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?w=400&h=300&fit=crop" },
     { id: "reels-bundle", label: "Reels Bundle", image: "https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?w=400&h=300&fit=crop" },
+    { id: "cartoon-videos", label: "Cartoon Videos Bundle", image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop" },
+    { id: "video-editing", label: "Video Editing Service", image: "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=400&h=300&fit=crop" },
+    { id: "graphic-design", label: "Graphic Design Service", image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&h=300&fit=crop" },
   ];
 
   const categories = [
@@ -249,8 +252,8 @@ export default function ListChannel() {
             <div className="mx-auto w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mb-6 animate-bounce">
               <Megaphone className="text-white w-10 h-10" />
             </div>
-            <CardTitle className="text-4xl font-bold mb-2">List Your Channel</CardTitle>
-            <p className="text-lg opacity-90">Sell your social media channels or reels bundles and earn 70% commission</p>
+            <CardTitle className="text-4xl font-bold mb-2">List Your Service</CardTitle>
+            <p className="text-lg opacity-90">Sell your channels, video bundles, or digital services and earn 70% commission</p>
           </CardHeader>
           
           <CardContent className="p-8">
@@ -261,13 +264,13 @@ export default function ListChannel() {
               </div>
               <ul className="text-sm text-red-700 space-y-2">
                 <li className="flex items-start"><Sparkles className="w-4 h-4 mr-2 mt-1" /> <span><strong>Commission:</strong> You earn 70% on every sale, platform takes 30%</span></li>
-                <li className="flex items-start"><Sparkles className="w-4 h-4 mr-2 mt-1" /> <span><strong>Review:</strong> Listing will be reviewed within 1 hour</span></li>
-                <li className="flex items-start"><Sparkles className="w-4 h-4 mr-2 mt-1" /> <span><strong>Channel Link:</strong> Must provide valid channel link (mandatory)</span></li>
-                <li className="flex items-start"><Sparkles className="w-4 h-4 mr-2 mt-1" /> <span><strong>Link Monitoring:</strong> System monitors your link 24/7</span></li>
-                <li className="flex items-start"><Sparkles className="w-4 h-4 mr-2 mt-1" /> <span><strong>Link Issues:</strong> Fix within 3 hours if inaccessible</span></li>
-                <li className="flex items-start"><Sparkles className="w-4 h-4 mr-2 mt-1" /> <span><strong>Fraud Prevention:</strong> Inaccessible for 5+ hours = Deletion</span></li>
-                <li className="flex items-start"><Sparkles className="w-4 h-4 mr-2 mt-1" /> <span><strong>Trust Policy:</strong> Keep link always active</span></li>
-                <li className="flex items-start"><Sparkles className="w-4 h-4 mr-2 mt-1" /> <span><strong>Quality:</strong> Authentic channels only - no fake accounts</span></li>
+                <li className="flex items-start"><Sparkles className="w-4 h-4 mr-2 mt-1" /> <span><strong>Review:</strong> Service will be reviewed within 1 hour</span></li>
+                <li className="flex items-start"><Sparkles className="w-4 h-4 mr-2 mt-1" /> <span><strong>Service Link:</strong> Must provide valid service/channel link (mandatory)</span></li>
+                <li className="flex items-start"><Sparkles className="w-4 h-4 mr-2 mt-1" /> <span><strong>Link Monitoring:</strong> System monitors your links 24/7</span></li>
+                <li className="flex items-start"><Sparkles className="w-4 h-4 mr-2 mt-1" /> <span><strong>Delivery:</strong> Deliver services within promised timeframe</span></li>
+                <li className="flex items-start"><Sparkles className="w-4 h-4 mr-2 mt-1" /> <span><strong>Quality Assurance:</strong> Maintain high service quality standards</span></li>
+                <li className="flex items-start"><Sparkles className="w-4 h-4 mr-2 mt-1" /> <span><strong>Trust Policy:</strong> Keep all links and services active and accessible</span></li>
+                <li className="flex items-start"><Sparkles className="w-4 h-4 mr-2 mt-1" /> <span><strong>Authenticity:</strong> Only authentic services and channels - no fake content</span></li>
               </ul>
             </div>
 

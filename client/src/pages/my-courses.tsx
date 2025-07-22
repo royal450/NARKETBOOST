@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BookOpen, Eye, Heart, ShoppingCart, TrendingUp, Plus, Edit, BarChart3, Users, DollarSign, Star, MessageSquare, Share2 } from "lucide-react";
 import { useLocation } from "wouter";
 
-interface Course {
+interface Service {
   id: string;
   title: string;
   description: string;
@@ -17,8 +17,8 @@ interface Course {
   fakePrice: number;
   category: string;
   thumbnail: string;
-  instructor: string;
-  instructorId: string;
+  seller: string;
+  sellerId: string;
   likes: number;
   comments: number;
   sales: number;
@@ -30,18 +30,20 @@ interface Course {
   commission: number;
   createdAt: string;
   updatedAt: string;
+  serviceType?: string;
+  deliveryTime?: string;
 }
 
-export default function MyCourses() {
+export default function MyServices() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
-  const [courses, setCourses] = useState<Course[]>([]);
+  const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
-    totalCourses: 0,
-    activeCourses: 0,
-    pendingCourses: 0,
-    blockedCourses: 0,
+    totalServices: 0,
+    activeServices: 0,
+    pendingServices: 0,
+    blockedServices: 0,
     totalSales: 0,
     totalEarnings: 0,
     totalViews: 0,
@@ -136,15 +138,15 @@ export default function MyCourses() {
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-white mb-2">My Courses</h1>
-            <p className="text-purple-100">Manage your courses and track performance</p>
+            <h1 className="text-4xl font-bold text-white mb-2">My Services</h1>
+            <p className="text-purple-100">Manage your services and track performance</p>
           </div>
           <Button 
             onClick={() => setLocation("/create-course")}
             className="bg-white text-purple-600 hover:bg-purple-50"
           >
             <Plus className="w-5 h-5 mr-2" />
-            Create New Course
+            List New Service
           </Button>
         </div>
 

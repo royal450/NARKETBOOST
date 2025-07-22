@@ -1,4 +1,4 @@
-export interface Channel {
+export interface Service {
   id: string;
   title: string;
   description: string;
@@ -29,12 +29,15 @@ export interface Channel {
   popularity?: number;
   transferRate?: number;
   shares?: number;
+  serviceType?: string;
+  deliveryTime?: string;
+  bundleContent?: string[];
 }
 
 export interface UserStats {
   wallet: number;
   totalSales: number;
-  purchasedChannels: number;
+  purchasedServices: number;
   todayEarnings: number;
   totalUsers: number;
   visitsToday: number;
@@ -50,5 +53,7 @@ export interface AdminStats {
 }
 
 // Backward compatibility
-export interface Course extends Channel {}
-export type { Channel as Course };
+export interface Channel extends Service {}
+export interface Course extends Service {}
+export type { Service as Channel };
+export type { Service as Course };

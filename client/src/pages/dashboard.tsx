@@ -52,13 +52,13 @@ export default function Dashboard() {
   const [shuffledChannels, setShuffledChannels] = useState<Course[]>([]);
 
   const categories = [
-    { id: "all", label: "All Channels", icon: Target, color: "from-purple-500 to-pink-500" },
+    { id: "all", label: "All Services", icon: Target, color: "from-purple-500 to-pink-500" },
     { id: "YouTube Channels", label: "YouTube", icon: Youtube, color: "from-red-500 to-orange-500" },
-    { id: "Instagram Channels", label: "Instagram", icon: Instagram, color: "from-pink-500 to-purple-500" },
-    { id: "Tech Channels", label: "Tech", icon: Megaphone, color: "from-blue-500 to-cyan-500" },
-    { id: "Business Channels", label: "Business", icon: Heart, color: "from-green-500 to-emerald-500" },
-    { id: "Creative Channels", label: "Creative", icon: Users, color: "from-red-500 to-pink-500" },
-    { id: "Marketing Channels", label: "Marketing", icon: Bot, color: "from-violet-500 to-purple-500" },
+    { id: "Instagram Services", label: "Instagram", icon: Instagram, color: "from-pink-500 to-purple-500" },
+    { id: "Video Bundles", label: "Video Bundles", icon: Megaphone, color: "from-blue-500 to-cyan-500" },
+    { id: "Discord Servers", label: "Discord", icon: Heart, color: "from-green-500 to-emerald-500" },
+    { id: "Telegram Channels", label: "Telegram", icon: Users, color: "from-red-500 to-pink-500" },
+    { id: "Digital Services", label: "Services", icon: Bot, color: "from-violet-500 to-purple-500" },
   ];
 
   // Fisher-Yates shuffle algorithm
@@ -307,7 +307,7 @@ export default function Dashboard() {
               <div className="w-32 h-32 bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-800 dark:to-pink-800 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Search className="w-16 h-16 text-purple-500 dark:text-purple-400" />
               </div>
-              <div className="text-2xl font-bold text-gray-700 dark:text-gray-300 mb-2">No courses found</div>
+              <div className="text-2xl font-bold text-gray-700 dark:text-gray-300 mb-2">No services found</div>
               <p className="text-gray-500 dark:text-gray-400">Try adjusting your search or filter criteria</p>
             </div>
           ) : (
