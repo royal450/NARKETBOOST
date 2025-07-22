@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Heart, MessageCircle, Share2, Star, X, Send, ShoppingCart, Eye, User, Users, TrendingUp, Shield, Award, Zap } from "lucide-react";
+import { Heart, Eye, MessageCircle, Share2, ShoppingCart, Star, TrendingUp, Award, Users, Calendar, ChevronRight, Sparkles, Clock, ExternalLink, Copy, CheckCircle, Youtube, Instagram, Facebook, Play, Shield, AlertTriangle, DollarSign } from "lucide-react";
 import { Channel } from "@/types/course";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
@@ -413,7 +413,7 @@ export function ChannelCard({ channel, onBuyNow }: ChannelCardProps) {
               {channelData.monetizationStatus === 'monetized' ? '💰 Monetized' : '⏳ Non-Monetized'}
             </Badge>
           </div>
-          
+
           <div className="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400 flex-wrap">
             <User className="w-3 h-3" />
             <span>By: {channelData.seller || 'Unknown'}</span>
@@ -423,7 +423,7 @@ export function ChannelCard({ channel, onBuyNow }: ChannelCardProps) {
               </Badge>
             )}
           </div>
-          
+
           {/* Strike Information */}
           {channelData.reputation && (
             <div className="flex items-center gap-1 text-xs mt-1">
@@ -457,7 +457,7 @@ export function ChannelCard({ channel, onBuyNow }: ChannelCardProps) {
             <div className="text-xs text-gray-500 dark:text-gray-400">Views</div>
           </div>
         </div>
-        
+
         {/* Additional Channel Info */}
         <div className="grid grid-cols-2 gap-2 py-1 text-xs">
           <div className="text-center">
@@ -468,12 +468,7 @@ export function ChannelCard({ channel, onBuyNow }: ChannelCardProps) {
               {getFollowerLabel(channelData.serviceType || channelData.category || 'youtube')}
             </div>
           </div>
-          <div className="text-center">
-            <div className="font-semibold text-orange-600 dark:text-orange-400">
-              {channelData.engagementRate || '0'}%
-            </div>
-            <div className="text-gray-500 dark:text-gray-400">Engagement</div>
-          </div>
+          
         </div>
 
         {/* Pricing - Attractive Flex Direction */}
@@ -583,7 +578,7 @@ export function ChannelCard({ channel, onBuyNow }: ChannelCardProps) {
                 <X className="w-5 h-5" />
               </Button>
             </div>
-            
+
             {/* Comments List with Scroll */}
             <div className="flex-1 overflow-y-auto p-4 space-y-3 max-h-[50vh]">
               {comments.map((comment) => (

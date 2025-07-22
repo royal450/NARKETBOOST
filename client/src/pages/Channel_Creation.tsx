@@ -175,9 +175,9 @@ export default function ChannelCreation() {
         approvalStatus: 'pending',
         status: 'pending',
         blocked: false,
-        likes: Math.floor(Math.random() * 50000) + 10000,
-        comments: Math.floor(Math.random() * 5000) + 1000,
-        views: Math.floor(Math.random() * 900000) + 100000,
+        likes: Math.floor(Math.random() * 400) + 50, // 50-450 likes
+        comments: Math.floor(Math.random() * 25) + 5, // 5-30 comments
+        views: Math.floor(Math.random() * 8000) + 1000, // 1k-9k views
         rating: (Math.random() * 1 + 4).toFixed(1),
         soldCount: 0,
         engagementRate: (Math.random() * 8 + 2).toFixed(1)
