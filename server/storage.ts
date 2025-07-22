@@ -92,7 +92,13 @@ export class MemStorage implements IStorage {
         rejectedAt: null,
         rejectedBy: null,
         blockedAt: null,
-        blockedBy: null
+        blockedBy: null,
+        soldOut: false,
+        soldOutAt: null,
+        bonusBadge: false,
+        badgeType: null,
+        badgeText: null,
+        badgeAddedAt: null
       },
       {
         id: 2,
@@ -124,7 +130,13 @@ export class MemStorage implements IStorage {
         rejectedAt: null,
         rejectedBy: null,
         blockedAt: null,
-        blockedBy: null
+        blockedBy: null,
+        soldOut: false,
+        soldOutAt: null,
+        bonusBadge: false,
+        badgeType: null,
+        badgeText: null,
+        badgeAddedAt: null
       },
       {
         id: 3,
@@ -156,7 +168,13 @@ export class MemStorage implements IStorage {
         rejectedAt: null,
         rejectedBy: null,
         blockedAt: null,
-        blockedBy: null
+        blockedBy: null,
+        soldOut: false,
+        soldOutAt: null,
+        bonusBadge: false,
+        badgeType: null,
+        badgeText: null,
+        badgeAddedAt: null
       }
     ];
     
@@ -255,7 +273,13 @@ export class MemStorage implements IStorage {
       rejectedAt: null,
       rejectedBy: null,
       blockedAt: null,
-      blockedBy: null
+      blockedBy: null,
+      soldOut: false,
+      soldOutAt: null,
+      bonusBadge: false,
+      badgeType: null,
+      badgeText: null,
+      badgeAddedAt: null
     };
     this.courses.set(id.toString(), course);
     return course;

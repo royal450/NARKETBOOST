@@ -514,14 +514,77 @@ export default function SuperAdmin() {
                             Delete
                           </Button>
                           
-                          <Button size="sm" variant="outline">
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => {
+                              const newThumbnail = prompt("Enter new thumbnail URL:");
+                              if (newThumbnail) {
+                                // Update thumbnail API call
+                                fetch(`/api/courses/${channel.id}`, {
+                                  method: 'PUT',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({ thumbnail: newThumbnail })
+                                }).then(() => {
+                                  toast({ title: "✅ Thumbnail Updated" });
+                                  queryClient.invalidateQueries({ queryKey: ['/api/admin/channels'] });
+                                });
+                              }
+                            }}
+                          >
                             <Image className="w-4 h-4 mr-1" />
                             Change Thumbnail
                           </Button>
                           
-                          <Button size="sm" variant="outline">
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            className={channel.soldOut ? "bg-red-100" : ""}
+                            onClick={() => {
+                              const action = channel.soldOut ? 'remove-sold-out' : 'sold-out';
+                              fetch(`/api/courses/${channel.id}/${action}`, {
+                                method: 'PUT'
+                              }).then(() => {
+                                toast({ 
+                                  title: channel.soldOut ? "✅ Sold Out Removed" : "🔴 Marked as Sold Out" 
+                                });
+                                queryClient.invalidateQueries({ queryKey: ['/api/admin/channels'] });
+                              });
+                            }}
+                          >
                             <Award className="w-4 h-4 mr-1" />
-                            Sold Out Badge
+                            {channel.soldOut ? 'Remove Sold Out' : 'Mark Sold Out'}
+                          </Button>
+                          
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            className={channel.bonusBadge ? "bg-yellow-100" : ""}
+                            onClick={() => {
+                              if (channel.bonusBadge) {
+                                fetch(`/api/courses/${channel.id}/remove-bonus-badge`, {
+                                  method: 'PUT'
+                                }).then(() => {
+                                  toast({ title: "✅ Bonus Badge Removed" });
+                                  queryClient.invalidateQueries({ queryKey: ['/api/admin/channels'] });
+                                });
+                              } else {
+                                const badgeText = prompt("Enter badge text:", "🔥 HOT");
+                                if (badgeText) {
+                                  fetch(`/api/courses/${channel.id}/bonus-badge`, {
+                                    method: 'PUT',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ badgeText, badgeType: "hot" })
+                                  }).then(() => {
+                                    toast({ title: "✅ Bonus Badge Added" });
+                                    queryClient.invalidateQueries({ queryKey: ['/api/admin/channels'] });
+                                  });
+                                }
+                              }
+                            }}
+                          >
+                            <Star className="w-4 h-4 mr-1" />
+                            {channel.bonusBadge ? 'Remove Badge' : 'Add Bonus Badge'}
                           </Button>
                         </div>
                       </div>

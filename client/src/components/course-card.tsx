@@ -295,12 +295,32 @@ export function ChannelCard({ channel, onBuyNow }: ChannelCardProps) {
           </Badge>
         </div>
 
-        {/* Hot Badge */}
-        <div className="absolute bottom-4 left-4">
-          <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-1 text-xs font-bold shadow-lg animate-bounce">
-            🔥 HOT
-          </Badge>
-        </div>
+        {/* Sold Out Badge */}
+        {channelData.soldOut && (
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+            <Badge className="bg-red-600 text-white px-6 py-3 text-lg font-bold shadow-xl animate-pulse">
+              🔴 SOLD OUT
+            </Badge>
+          </div>
+        )}
+
+        {/* Bonus Badge */}
+        {channelData.bonusBadge && !channelData.soldOut && (
+          <div className="absolute bottom-4 left-4">
+            <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 text-xs font-bold shadow-lg animate-bounce">
+              {channelData.badgeText || "🔥 HOT"}
+            </Badge>
+          </div>
+        )}
+
+        {/* Default Hot Badge if no bonus badge */}
+        {!channelData.bonusBadge && !channelData.soldOut && (
+          <div className="absolute bottom-4 left-4">
+            <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-1 text-xs font-bold shadow-lg animate-bounce">
+              🔥 HOT
+            </Badge>
+          </div>
+        )}
 
         {/* Views Badge */}
         <div className="absolute bottom-4 right-4">

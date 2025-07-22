@@ -148,6 +148,84 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Channel submission endpoint
+  app.post("/api/channels", async (req, res) => {
+    try {
+      const channelData = req.body;
+      const newChannel = await storage.createCourse({
+        ...channelData,
+        status: "pending",
+        approvalStatus: "pending",
+        sellerId: 1, // Should come from auth
+        seller: channelData.seller || "User"
+      });
+      res.json(newChannel);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create channel" });
+    }
+  });
+
+  // Sold out badge injection
+  app.put("/api/courses/:id/sold-out", async (req, res) => {
+    try {
+      const courseId = req.params.id;
+      const updated = await storage.updateCourse(courseId, { 
+        soldOut: true,
+        soldOutAt: new Date()
+      });
+      res.json(updated);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to mark as sold out" });
+    }
+  });
+
+  // Remove sold out badge
+  app.put("/api/courses/:id/remove-sold-out", async (req, res) => {
+    try {
+      const courseId = req.params.id;
+      const updated = await storage.updateCourse(courseId, { 
+        soldOut: false,
+        soldOutAt: null
+      });
+      res.json(updated);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to remove sold out badge" });
+    }
+  });
+
+  // Bonus badge system
+  app.put("/api/courses/:id/bonus-badge", async (req, res) => {
+    try {
+      const courseId = req.params.id;
+      const { badgeType, badgeText } = req.body;
+      const updated = await storage.updateCourse(courseId, { 
+        bonusBadge: true,
+        badgeType: badgeType || "hot",
+        badgeText: badgeText || "🔥 HOT",
+        badgeAddedAt: new Date()
+      });
+      res.json(updated);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to add bonus badge" });
+    }
+  });
+
+  // Remove bonus badge
+  app.put("/api/courses/:id/remove-bonus-badge", async (req, res) => {
+    try {
+      const courseId = req.params.id;
+      const updated = await storage.updateCourse(courseId, { 
+        bonusBadge: false,
+        badgeType: null,
+        badgeText: null,
+        badgeAddedAt: null
+      });
+      res.json(updated);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to remove bonus badge" });
+    }
+  });
+
   // Payment Verification
   app.post("/api/payments/verify", async (req, res) => {
     try {

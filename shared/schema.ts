@@ -49,6 +49,12 @@ export const channels = pgTable("channels", {
   rejectedBy: text("rejected_by"),
   blockedAt: timestamp("blocked_at"),
   blockedBy: text("blocked_by"),
+  soldOut: boolean("sold_out").default(false),
+  soldOutAt: timestamp("sold_out_at"),
+  bonusBadge: boolean("bonus_badge").default(false),
+  badgeType: text("badge_type"),
+  badgeText: text("badge_text"),
+  badgeAddedAt: timestamp("badge_added_at"),
 });
 
 export const payments = pgTable("payments", {

@@ -38,10 +38,12 @@ export default function Dashboard() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   
-  // Fetch active services from backend API
+  // Fetch active services from backend API (only approved ones)
   const { data: services = [], isLoading: loading } = useQuery({
     queryKey: ["/api/courses"],
-    select: (data) => data || []
+    select: (data) => (data || []).filter((course: any) => 
+      course.status === 'active' && course.approvalStatus === 'approved'
+    )
   });
   const [filteredServices, setFilteredServices] = useState<Service[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
