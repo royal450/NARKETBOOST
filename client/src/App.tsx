@@ -264,9 +264,6 @@ export default function App() {
         <Route path="/r/:code" component={ReferralDetector} />
         <Route path="/invite/:code" component={ReferralDetector} />
         <Route path="/inviteCode*" component={ReferralDetector} />
-        <Route path="/" component={AutoRedirectRoute} />
-        <Route path="/not-found" component={NotFound} />
-        <Route path="/withdrawal" component={Withdrawal} />
         <Route path="/profile-new">
           <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
             <ProtectedRoute component={ProfileNew} />
@@ -292,6 +289,9 @@ export default function App() {
             <ProtectedRoute component={WithdrawalPopup} />
           </Suspense>
         </Route>
+        <Route path="/" component={AutoRedirectRoute} />
+        <Route path="/not-found" component={NotFound} />
+        <Route path="/withdrawal" component={Withdrawal} />
         <Route component={NotFound} />
       </Switch>
       <Toaster />
