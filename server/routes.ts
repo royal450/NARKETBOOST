@@ -346,6 +346,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Add channels alias for admin panel
+  app.get("/api/admin/channels", async (req, res) => {
+    try {
+      const { status } = req.query;
+      let courses = await storage.getCourses();
+      
+      if (status) {
+        courses = courses.filter(course => course.status === status);
+      }
+      
+      console.log(`Admin channels found: ${courses.length}`);
+      res.json(courses);
+    } catch (error) {
+      console.error('Error fetching admin channels:', error);
+      res.status(500).json({ error: "Failed to fetch admin channels" });
+    }
+  });
+
   app.get("/api/admin/courses/pending", async (req, res) => {
     try {
       const courses = await storage.getCourses();
@@ -353,6 +371,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(pendingCourses);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch pending courses" });
+    }
+  });
+
+  // Add channels/pending alias for admin panel
+  app.get("/api/admin/channels/pending", async (req, res) => {
+    try {
+      const courses = await storage.getCourses();
+      console.log(`Total courses found: ${courses.length}`);
+      const pendingCourses = courses.filter(course => {
+        console.log(`Course ${course.id}: status=${course.status}, approvalStatus=${course.approvalStatus}`);
+        return course.status === 'pending' && course.approvalStatus === 'pending';
+      });
+      console.log(`Pending courses filtered: ${pendingCourses.length}`);
+      res.json(pendingCourses);
+    } catch (error) {
+      console.error('Error fetching pending channels:', error);
+      res.status(500).json({ error: "Failed to fetch pending channels" });
     }
   });
 
