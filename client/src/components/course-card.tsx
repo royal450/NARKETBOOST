@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Heart, Eye, MessageCircle, Share2, ShoppingCart, Star, TrendingUp, Award, Users, Calendar, ChevronRight, Sparkles, Clock, ExternalLink, Copy, CheckCircle, Youtube, Instagram, Facebook, Play, Shield, AlertTriangle, DollarSign } from "lucide-react";
+import { Heart, Eye, MessageCircle, Share2, ShoppingCart, Star, TrendingUp, Award, Users, Calendar, ChevronRight, Sparkles, Clock, ExternalLink, Copy, CheckCircle, Youtube, Instagram, Facebook, Play, Shield, AlertTriangle, DollarSign, User, Send, X, Zap } from "lucide-react";
 import { Channel } from "@/types/course";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
