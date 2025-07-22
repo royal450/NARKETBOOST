@@ -145,3 +145,15 @@ export type Course = Channel;
 export type Promotion = Listing;
 export type InsertCourse = InsertChannel;
 export type InsertPromotion = InsertListing;
+
+// Admin stats interface
+export interface AdminStats {
+  totalUsers: number;
+  totalCourses: number;
+  approvedCourses: number;
+  pendingCourses: number;
+  rejectedCourses: number;
+  totalSales: number;
+  totalRevenue: number;
+  avgRating: number;
+}

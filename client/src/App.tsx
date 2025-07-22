@@ -11,6 +11,10 @@ import Payment from "@/pages/payment";
 import Profile from "@/pages/profile";
 import Promotion from "@/pages/promotion";
 import AdminPanel from "@/pages/admin";
+const ChannelCreationModern = lazy(() => import("@/pages/channel-creation-modern"));
+const FullFeaturedAdmin = lazy(() => import("@/pages/full-featured-admin"));
+const ChannelShowCard = lazy(() => import("@/pages/channel-show-full-attractive-card"));
+const WithdrawalPopup = lazy(() => import("@/pages/withdrawal-popup"));
 import CreateCourse from "@/pages/create-course";
 import MyCourses from "@/pages/my-courses";
 import Referral from "@/pages/referral";
@@ -71,7 +75,7 @@ function AutoRedirectRoute() {
     if (!loading) {
       if (user) {
         // Check user location to determine dashboard
-        const userLocation = user.location || "India";
+        const userLocation = (user as any)?.location || "India";
         if (userLocation === "India") {
           setLocation("/dashboard");
         } else {
@@ -116,7 +120,7 @@ function DashboardRoute() {
   if (!user) return null;
 
   // Check user location to determine which dashboard to show
-  const userLocation = user.location || "India";
+  const userLocation = (user as any)?.location || "India";
   if (userLocation === "India") {
     return <Dashboard />;
   } else {
@@ -222,8 +226,12 @@ export default function App() {
           <ProtectedRoute component={CreateCourse} />
         </Route>
         <Route path="/admin">
-          <AdminPanel />
+          <FullFeaturedAdmin />
         </Route>
+        <Route path="/channel-creation">
+          <ProtectedRoute component={ChannelCreationModern} />
+        </Route>
+        <Route path="/channels" component={ChannelShowCard} />
         <Route path="/payment/:channelId">
           <ProtectedRoute component={Payment} />
         </Route>
