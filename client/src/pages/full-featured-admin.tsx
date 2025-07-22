@@ -72,13 +72,13 @@ export default function FullFeaturedAdmin() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [expandedCards, setExpandedCards] = useState<Set<number>>(new Set());
 
-  // Authentication
+  // Authentication with complex password
   const handleLogin = () => {
-    if (password === "admin123") {
+    if (password === "SuperAdmin@2025#ChannelMarket$Pro") {
       setIsAuthenticated(true);
-      toast({ title: "Admin Access Granted", description: "Welcome to the admin panel!" });
+      toast({ title: "Admin Access Granted", description: "Welcome to the Complete Admin Control Panel!" });
     } else {
-      toast({ title: "Access Denied", description: "Invalid password", variant: "destructive" });
+      toast({ title: "Access Denied", description: "Invalid admin password", variant: "destructive" });
     }
   };
 
@@ -105,7 +105,10 @@ export default function FullFeaturedAdmin() {
 
   // Channel Management Mutations
   const approveChannelMutation = useMutation({
-    mutationFn: (id: number) => apiRequest(`/api/admin/channels/${id}/approve`, { method: 'POST' }),
+    mutationFn: (id: number) => apiRequest('/api/admin/channels/approve', { 
+      method: 'POST',
+      body: JSON.stringify({ id })
+    }),
     onSuccess: () => {
       toast({ title: "Channel Approved", description: "Channel is now live!" });
       refetchPending();
@@ -116,9 +119,9 @@ export default function FullFeaturedAdmin() {
 
   const rejectChannelMutation = useMutation({
     mutationFn: ({ id, reason }: { id: number; reason: string }) => 
-      apiRequest(`/api/admin/channels/${id}/reject`, { 
+      apiRequest('/api/admin/channels/reject', { 
         method: 'POST', 
-        body: JSON.stringify({ reason }) 
+        body: JSON.stringify({ id, reason }) 
       }),
     onSuccess: () => {
       toast({ title: "Channel Rejected", description: "Rejection reason sent to user." });
@@ -129,9 +132,9 @@ export default function FullFeaturedAdmin() {
 
   const blockChannelMutation = useMutation({
     mutationFn: ({ id, reason }: { id: number; reason: string }) => 
-      apiRequest(`/api/admin/channels/${id}/block`, { 
+      apiRequest('/api/admin/channels/block', { 
         method: 'POST', 
-        body: JSON.stringify({ reason }) 
+        body: JSON.stringify({ id, reason }) 
       }),
     onSuccess: () => {
       toast({ title: "Channel Blocked", description: "Channel has been blocked." });
@@ -140,7 +143,10 @@ export default function FullFeaturedAdmin() {
   });
 
   const deleteChannelMutation = useMutation({
-    mutationFn: (id: number) => apiRequest(`/api/admin/channels/${id}`, { method: 'DELETE' }),
+    mutationFn: (id: number) => apiRequest('/api/admin/channels/delete', { 
+      method: 'POST',
+      body: JSON.stringify({ id })
+    }),
     onSuccess: () => {
       toast({ title: "Channel Deleted", description: "Channel permanently removed." });
       refetchAll();
@@ -150,8 +156,8 @@ export default function FullFeaturedAdmin() {
 
   const updateChannelMutation = useMutation({
     mutationFn: (channel: Partial<Channel>) => 
-      apiRequest(`/api/admin/channels/${channel.id}`, { 
-        method: 'PATCH', 
+      apiRequest('/api/admin/channels/update', { 
+        method: 'POST', 
         body: JSON.stringify(channel) 
       }),
     onSuccess: () => {
@@ -164,9 +170,9 @@ export default function FullFeaturedAdmin() {
   // User Management Mutations
   const giveBonusMutation = useMutation({
     mutationFn: ({ userId, amount }: { userId: number; amount: number }) => 
-      apiRequest(`/api/admin/users/${userId}/bonus`, { 
+      apiRequest('/api/admin/users/bonus', { 
         method: 'POST', 
-        body: JSON.stringify({ amount }) 
+        body: JSON.stringify({ userId, amount }) 
       }),
     onSuccess: () => {
       toast({ title: "Bonus Given", description: `₹${bonusAmount} added to user's wallet.` });
@@ -176,7 +182,10 @@ export default function FullFeaturedAdmin() {
   });
 
   const blockUserMutation = useMutation({
-    mutationFn: (userId: number) => apiRequest(`/api/admin/users/${userId}/block`, { method: 'POST' }),
+    mutationFn: (userId: number) => apiRequest('/api/admin/users/block', { 
+      method: 'POST',
+      body: JSON.stringify({ userId })
+    }),
     onSuccess: () => {
       toast({ title: "User Blocked", description: "User access has been restricted." });
       refetchUsers();
@@ -184,7 +193,10 @@ export default function FullFeaturedAdmin() {
   });
 
   const giveAdminBadgeMutation = useMutation({
-    mutationFn: (userId: number) => apiRequest(`/api/admin/users/${userId}/badge`, { method: 'POST' }),
+    mutationFn: (userId: number) => apiRequest('/api/admin/users/badge', { 
+      method: 'POST',
+      body: JSON.stringify({ userId })
+    }),
     onSuccess: () => {
       toast({ title: "Admin Badge Given", description: "User now has admin verification badge." });
       refetchUsers();

@@ -25,6 +25,7 @@ import Withdrawal from "@/pages/withdrawal";
 const ChannelCreationModern = lazy(() => import("@/pages/channel-creation-modern"));
 const FullFeaturedAdmin = lazy(() => import("@/pages/full-featured-admin"));
 const ChannelShowCard = lazy(() => import("@/pages/channel-show-full-attractive-card"));
+const EnhancedChannelSubmission = lazy(() => import("@/pages/enhanced-channel-submission"));
 
 function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
   const { user, loading } = useAuth();
@@ -228,9 +229,6 @@ export default function App() {
           <ProtectedRoute component={CreateCourse} />
         </Route>
         <Route path="/admin">
-          <AdminPanel />
-        </Route>
-        <Route path="/admin-new">
           <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
             <FullFeaturedAdmin />
           </Suspense>
@@ -238,6 +236,11 @@ export default function App() {
         <Route path="/channel-creation">
           <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
             <ProtectedRoute component={ChannelCreationModern} />
+          </Suspense>
+        </Route>
+        <Route path="/submit-channel">
+          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
+            <ProtectedRoute component={EnhancedChannelSubmission} />
           </Suspense>
         </Route>
         <Route path="/channels">
