@@ -13,8 +13,6 @@ import Payment from "@/pages/payment";
 import Profile from "@/pages/profile";
 import Promotion from "@/pages/promotion";
 import AdminPanel from "@/pages/admin";
-import CreateCourse from "@/pages/create-course";
-import MyCourses from "@/pages/my-courses";
 import Referral from "@/pages/referral";
 import NotFound from "@/pages/not-found";
 import Withdrawal from "@/pages/withdrawal";
@@ -26,10 +24,6 @@ const ChannelShowCard = lazy(() => import("@/pages/channel-show-full-attractive-
 const EnhancedChannelSubmission = lazy(() => import("@/pages/enhanced-channel-submission"));
 
 // Lazy loaded new pages
-const ProfileNew = lazy(() => import("@/pages/profile-new"));
-const SignupFixed = lazy(() => import("@/pages/signup-fixed"));
-const UserProfileNew = lazy(() => import("@/pages/user-profile"));
-const UserProfileAlt = lazy(() => import("@/pages/userprofile"));
 const WithdrawalPopup = lazy(() => import("@/pages/withdrawal-popup"));
 
 function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
@@ -213,10 +207,14 @@ export default function App() {
           <ProtectedRoute component={Profile} />
         </Route>
         <Route path="/my-channels">
-          <ProtectedRoute component={MyCourses} />
+          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
+            <ProtectedRoute component={EnhancedChannelSubmission} />
+          </Suspense>
         </Route>
         <Route path="/my-courses">
-          <ProtectedRoute component={MyCourses} />
+          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
+            <ProtectedRoute component={EnhancedChannelSubmission} />
+          </Suspense>
         </Route>
         <Route path="/user-profile/:userId">
           <ProtectedRoute component={Profile} />
@@ -296,26 +294,7 @@ export default function App() {
         <Route path="/r/:code" component={ReferralDetector} />
         <Route path="/invite/:code" component={ReferralDetector} />
         <Route path="/inviteCode*" component={ReferralDetector} />
-        <Route path="/profile-new">
-          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
-            <ProtectedRoute component={ProfileNew} />
-          </Suspense>
-        </Route>
-        <Route path="/signup-fixed">
-          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
-            <PublicRoute component={SignupFixed} />
-          </Suspense>
-        </Route>
-        <Route path="/user-profile-new/:userId">
-          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
-            <ProtectedRoute component={UserProfileNew} />
-          </Suspense>
-        </Route>
-        <Route path="/userprofile/:userId">
-          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
-            <ProtectedRoute component={UserProfileAlt} />
-          </Suspense>
-        </Route>
+        
         <Route path="/withdrawal-popup">
           <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
             <ProtectedRoute component={WithdrawalPopup} />
