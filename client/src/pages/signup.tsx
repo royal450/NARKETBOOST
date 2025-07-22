@@ -30,7 +30,7 @@ export default function Signup() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (formData.password !== formData.confirmPassword) {
       toast({
         title: "Password Mismatch",
@@ -46,82 +46,16 @@ export default function Signup() {
       await signup(formData.email, formData.password, formData.fullName, referralCode);
 
       // If there's a referral code, process the referral
-      if (referralCode && referralCode.trim()) {
-        try {
-          // Find the referrer first
-          const usersRef = ref(database, 'users');
-          const allUsersSnapshot = await get(usersRef);
-
-          if (allUsersSnapshot.exists()) {
-            const allUsers = allUsersSnapshot.val();
-            const referrerId = Object.keys(allUsers).find(userId => 
-              allUsers[userId].referralCode === referralCode.trim()
-            );
-
-            if (referrerId && referrerId !== user?.uid) {
-              const now = Date.now();
-              
-              // Real-time commission processing - Instant bonus
-              const commissionAmount = 10; // ₹10 per referral
-
-              // Update referrer's wallet immediately
-              const referrerData = allUsers[referrerId];
-              const referrerRef = ref(database, `users/${referrerId}`);
-              await update(referrerRef, {
-                walletBalance: (referrerData.walletBalance || 0) + commissionAmount,
-                totalEarnings: (referrerData.totalEarnings || 0) + commissionAmount,
-                totalReferrals: (referrerData.totalReferrals || 0) + 1,
-              });
-
-              // Add to referrer's history
-              const referrerHistory = referrerData.referralHistory || [];
-              referrerHistory.push({
-                id: user?.uid,
-                name: formData.fullName,
-                email: formData.email,
-                joinDate: new Date().toISOString(),
-                commission: commissionAmount,
-                type: 'signup'
-              });
-              await update(referrerRef, { referralHistory: referrerHistory });
-
-              // Record referral transaction
-              const referralData = {
-                userId: user?.uid,
-                name: formData.fullName,
-                email: formData.email,
-                joinDate: new Date().toLocaleDateString(),
-                joinTimestamp: now,
-                earnings: commissionAmount,
-                status: 'active',
-                referralBonus: commissionAmount,
-                processedAt: new Date().toISOString()
-              };
-
-              await set(ref(database, `referrals/${referrerId}/${user?.uid}`), referralData);
-
-              // Mark current user as referred
+      // Referral processing is now handled in the auth hook
+            // Just mark the user with referral info for tracking
+            if (referralCode && referralCode.trim()) {
               await update(ref(database, `users/${user?.uid}`), {
-                referredBy: referralCode.trim(),
                 referralSource: 'direct_link',
                 signupDate: now,
-                referredAt: now,
                 phoneNumber: formData.phoneNumber
               });
-
-              toast({
-                title: "Referral Success! 🎉",
-                description: `You've joined through ${referralCode}. The referrer earned ₹10 instantly!`,
-              });
+              console.log('User marked with referral source');
             }
-          }
-        } catch (error) {
-          console.error("Referral processing error:", error);
-        }
-
-        // Clear referral code from localStorage
-        localStorage.removeItem('referralCode');
-      }
 
       toast({
         title: "Account Created!",
@@ -149,7 +83,7 @@ export default function Signup() {
     if (urlParams.has('ref')) {
       detectedReferralCode = urlParams.get('ref');
     }
-    
+
     // Check for #ref= format
     if (hash.includes('#ref=')) {
       detectedReferralCode = hash.split('#ref=')[1];
@@ -169,10 +103,10 @@ export default function Signup() {
     if (detectedReferralCode) {
       setReferralCode(detectedReferralCode.trim());
       setReferralCodeDisabled(true);
-      
+
       // Store in localStorage for persistence
       localStorage.setItem('referralCode', detectedReferralCode.trim());
-      
+
       toast({
         title: "Referral Code Detected! 🎉",
         description: `You're signing up with referral code: ${detectedReferralCode}`,
