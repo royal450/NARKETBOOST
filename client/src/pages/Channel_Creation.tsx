@@ -13,6 +13,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Youtube, Instagram, Facebook, MessageSquare, Play, Video, Settings, Star, TrendingUp, User, Eye, Heart, Clock, Award, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
+import { useFirebaseServices } from "@/hooks/use-firebase-realtime";
+import { useAuth } from "@/hooks/use-auth";
 
 // Enhanced form schema with all required fields
 const channelSubmissionSchema = z.object({
@@ -96,6 +98,8 @@ export default function ChannelCreation() {
   const [showCustomCategory, setShowCustomCategory] = useState(false);
   const [showCustomService, setShowCustomService] = useState(false);
 
+  const { createService } = useFirebaseServices();
+  
   const {
     register,
     handleSubmit,

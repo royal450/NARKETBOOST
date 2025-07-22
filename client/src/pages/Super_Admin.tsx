@@ -19,6 +19,7 @@ import {
   Zap, Heart, MessageSquare, Share2, ThumbsUp, Lock
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { useFirebaseServices, useFirebaseUsers, useFirebaseAdminStats } from "@/hooks/use-firebase-realtime";
 import type { Channel, User, AdminStats } from "@shared/schema";
 
 // Complex admin password
@@ -92,25 +93,15 @@ export default function SuperAdmin() {
   };
 
   // Data fetching
-  const { data: adminStats, isLoading: loadingStats } = useQuery<AdminStats>({
-    queryKey: ['/api/admin/stats'],
-    enabled: isAuthenticated
-  });
-
-  const { data: allChannels = [], isLoading: loadingChannels } = useQuery<Channel[]>({
-    queryKey: ['/api/admin/channels'],
-    enabled: isAuthenticated
-  });
-
-  const { data: pendingChannels = [] } = useQuery<Channel[]>({
-    queryKey: ['/api/admin/channels/pending'],
-    enabled: isAuthenticated
-  });
-
-  const { data: users = [] } = useQuery<User[]>({
-    queryKey: ['/api/admin/users'],
-    enabled: isAuthenticated
-  });
+  // Use Firebase realtime data
+  const { adminStats, loading: loadingStats } = useFirebaseAdminStats();
+  const { services: allChannels = [], loading: loadingChannels } = useFirebaseServices();
+  const { users = [] } = useFirebaseUsers();
+  
+  // Filter pending channels
+  const pendingChannels = allChannels.filter((channel: any) => 
+    channel.approvalStatus === 'pending' || channel.status === 'pending'
+  );
 
   // Mock withdrawal requests (should come from API)
   const [withdrawalRequests] = useState<WithdrawalRequest[]>([

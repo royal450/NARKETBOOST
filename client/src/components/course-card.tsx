@@ -15,8 +15,9 @@ interface ChannelCardProps {
 }
 
 // Backward compatibility
-interface CourseCardProps extends ChannelCardProps {
-  course: Channel;
+interface CourseCardProps {
+  channel: Channel;
+  onBuyNow: (channel: Channel) => void;
 }
 
 interface Comment {
@@ -601,6 +602,6 @@ export function ChannelCard({ channel, onBuyNow }: ChannelCardProps) {
 }
 
 // Export backward compatibility function at bottom
-export function CourseCard({ course, onBuyNow }: CourseCardProps) {
-  return <ChannelCard channel={course} onBuyNow={onBuyNow} />;
+export function CourseCard({ channel, onBuyNow }: CourseCardProps) {
+  return <ChannelCard channel={channel} onBuyNow={onBuyNow} />;
 }

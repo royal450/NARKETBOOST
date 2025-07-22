@@ -62,16 +62,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         );
         
         if (referrer) {
-          const [referrerId, referrerData] = referrer;
+          const [referrerId, referrerData] = referrer as [string, any];
           
           // Give bonus to both users
           const bonusAmount = 10;
           
           // Update referrer
           await update(ref(database, `users/${referrerId}`), {
-            walletBalance: (referrerData.walletBalance || 0) + bonusAmount,
-            totalEarnings: (referrerData.totalEarnings || 0) + bonusAmount,
-            totalReferrals: (referrerData.totalReferrals || 0) + 1
+            walletBalance: (referrerData?.walletBalance || 0) + bonusAmount,
+            totalEarnings: (referrerData?.totalEarnings || 0) + bonusAmount,
+            totalReferrals: (referrerData?.totalReferrals || 0) + 1
           });
           
           // Update new user

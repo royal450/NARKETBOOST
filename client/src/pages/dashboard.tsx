@@ -29,8 +29,8 @@ import {
   Sparkles
 } from "lucide-react";
 import { Service } from "@/types/course";
-import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
+import { useFirebaseServices } from "@/hooks/use-firebase-realtime";
 
 // Services Marketplace Dashboard
 
@@ -38,13 +38,8 @@ export default function Dashboard() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   
-  // Fetch active services from backend API (only approved ones)
-  const { data: services = [], isLoading: loading } = useQuery({
-    queryKey: ["/api/courses"],
-    select: (data) => (data || []).filter((course: any) => 
-      course.status === 'active' && course.approvalStatus === 'approved'
-    )
-  });
+  // Fetch active services from Firebase realtime database (only approved ones)
+  const { services, loading, updateServiceInteraction } = useFirebaseServices();
   const [filteredServices, setFilteredServices] = useState<Service[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedService, setSelectedService] = useState<Service | null>(null);
@@ -325,7 +320,7 @@ export default function Dashboard() {
                   onMouseLeave={() => setHoveredService(null)}
                 >
                   <CourseCard
-                    course={service}
+                    channel={service}
                     onBuyNow={handleBuyNow}
                   />
                 </div>
