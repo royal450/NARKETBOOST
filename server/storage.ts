@@ -12,25 +12,25 @@ export interface IStorage {
   updateUserWallet(userId: number, amount: number): Promise<void>;
   getUsers(): Promise<User[]>;
   updateUser(userId: string, updates: any): Promise<User>;
-  
+
   // Course/Channel methods
   getCourses(): Promise<Channel[]>;
   getUserCourses(userId: string): Promise<Channel[]>;
   createCourse(course: any): Promise<Channel>;
   updateCourse(courseId: string, updates: any): Promise<Channel>;
   deleteCourse(courseId: string): Promise<void>;
-  
+
   // Payment methods
   createPayment(payment: any): Promise<Payment>;
-  
+
   // Referral methods
   trackReferral(referrerId: number, referredId: number): Promise<void>;
   getReferralByBuyer(buyerId: number): Promise<ReferralBonus | undefined>;
-  
+
   // Withdrawal methods
   getWithdrawals(): Promise<any[]>;
   updateWithdrawal(withdrawalId: string, updates: any): Promise<any>;
-  
+
   // Admin methods
   getAdminStats(): Promise<any>;
 }
@@ -54,11 +54,11 @@ export class MemStorage implements IStorage {
     this.currentCourseId = 1;
     this.currentPaymentId = 1;
     this.currentReferralId = 1;
-    
+
     // Add some sample data for testing
     this.initializeSampleData();
   }
-  
+
   private initializeSampleData() {
     // Add sample services for testing
     const sampleServices: Channel[] = [
@@ -177,7 +177,7 @@ export class MemStorage implements IStorage {
         badgeAddedAt: null
       }
     ];
-    
+
     sampleServices.forEach(service => {
       this.courses.set(service.id.toString(), service);
     });
@@ -290,7 +290,7 @@ export class MemStorage implements IStorage {
     if (!course) {
       throw new Error("Course not found");
     }
-    
+
     const updated = { ...course, ...updates };
     this.courses.set(courseId, updated);
     return updated;
@@ -302,7 +302,48 @@ export class MemStorage implements IStorage {
 
   // Users management methods
   async getUsers(): Promise<User[]> {
-    return Array.from(this.users.values());
+    const userArray = Array.from(this.users.values());
+
+    // If no users in database, return sample users for testing
+    if (userArray.length === 0) {
+      return [
+        {
+          id: 1,
+          email: "admin@example.com",
+          displayName: "Super Admin",
+          walletBalance: 5000,
+          totalReferrals: 25,
+          isActive: true,
+          lastActiveAt: new Date(),
+          createdAt: new Date(),
+          referralCode: "ADMIN123"
+        },
+        {
+          id: 2,
+          email: "user1@example.com", 
+          displayName: "John Doe",
+          walletBalance: 1500,
+          totalReferrals: 10,
+          isActive: true,
+          lastActiveAt: new Date(),
+          createdAt: new Date(),
+          referralCode: "USER001"
+        },
+        {
+          id: 3,
+          email: "user2@example.com",
+          displayName: "Jane Smith", 
+          walletBalance: 2300,
+          totalReferrals: 15,
+          isActive: true,
+          lastActiveAt: new Date(),
+          createdAt: new Date(),
+          referralCode: "USER002"
+        }
+      ];
+    }
+
+    return userArray;
   }
 
   async updateUser(userId: string, updates: any): Promise<User> {
@@ -310,7 +351,7 @@ export class MemStorage implements IStorage {
     if (!user) {
       throw new Error("User not found");
     }
-    
+
     const updated = { ...user, ...updates };
     this.users.set(parseInt(userId), updated);
     return updated;
@@ -368,7 +409,7 @@ export class MemStorage implements IStorage {
       createdAt: new Date()
     };
     this.referrals.set(id, referral);
-    
+
     // Update referrer's total referrals
     const referrer = this.users.get(referrerId);
     if (referrer) {

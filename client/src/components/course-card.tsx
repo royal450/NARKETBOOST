@@ -295,12 +295,15 @@ export function ChannelCard({ channel, onBuyNow }: ChannelCardProps) {
           </Badge>
         </div>
 
-        {/* Sold Out Badge */}
+        {/* Sold Out Overlay */}
         {channelData.soldOut && (
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-            <Badge className="bg-red-600 text-white px-6 py-3 text-lg font-bold shadow-xl animate-pulse">
-              🔴 SOLD OUT
-            </Badge>
+          <div className="absolute inset-0 bg-gradient-to-br from-orange-500/80 via-red-500/80 to-red-600/80 backdrop-blur-sm flex items-center justify-center z-10">
+            <div className="text-center">
+              <Badge className="bg-gradient-to-r from-red-600 to-orange-600 text-white px-8 py-4 text-xl font-bold shadow-2xl animate-pulse border-2 border-white">
+                🔴 SOLD OUT 😎
+              </Badge>
+              <p className="text-white font-bold mt-2 text-sm">Service no longer available</p>
+            </div>
           </div>
         )}
 
@@ -371,20 +374,20 @@ export function ChannelCard({ channel, onBuyNow }: ChannelCardProps) {
         </p>
 
         {/* Price Section - Fake Price for Marketing, Real Price Display */}
-        <div className="flex items-center justify-between mb-4">
+        <div className={`flex items-center justify-between mb-4 ${channelData.soldOut ? 'opacity-60' : ''}`}>
           <div className="flex flex-col space-y-2">
             {/* Marketing/Fake Price Box */}
             <div className="flex items-center space-x-2">
-              <div className="bg-red-100 border border-red-300 px-3 py-1 rounded-lg">
-                <span className="text-lg text-red-600 line-through font-medium">₹{Math.floor((channelData.fakePrice || channelData.price * 2.5)).toLocaleString()}</span>
+              <div className={`${channelData.soldOut ? 'bg-orange-100 border-orange-300' : 'bg-red-100 border-red-300'} border px-3 py-1 rounded-lg`}>
+                <span className={`text-lg line-through font-medium ${channelData.soldOut ? 'text-orange-600' : 'text-red-600'}`}>₹{Math.floor((channelData.fakePrice || channelData.price * 2.5)).toLocaleString()}</span>
               </div>
-              <div className="bg-green-500 text-white px-2 py-1 rounded text-xs font-medium">
+              <div className={`${channelData.soldOut ? 'bg-orange-500' : 'bg-green-500'} text-white px-2 py-1 rounded text-xs font-medium`}>
                 {Math.floor(((((channelData.fakePrice || channelData.price * 2.5) - channelData.price) / (channelData.fakePrice || channelData.price * 2.5)) * 100))}% OFF
               </div>
             </div>
             {/* Real Price */}
             <div className="flex items-center space-x-2">
-              <span className="text-2xl font-bold text-green-600">₹{Math.floor(channelData.price).toLocaleString()}</span>
+              <span className={`text-2xl font-bold ${channelData.soldOut ? 'text-orange-600' : 'text-green-600'}`}>₹{Math.floor(channelData.price).toLocaleString()}</span>
             </div>
           </div>
           <div className="flex items-center space-x-1">
@@ -394,22 +397,22 @@ export function ChannelCard({ channel, onBuyNow }: ChannelCardProps) {
         </div>
 
         {/* Stats */}
-        <div className="flex items-center justify-between text-sm text-gray-600 mb-4">
+        <div className={`flex items-center justify-between text-sm mb-4 ${channelData.soldOut ? 'text-orange-600 opacity-70' : 'text-gray-600'}`}>
           <div className="flex items-center space-x-4">
             <span className="flex items-center">
-              <Heart className="w-4 h-4 mr-1" />
+              <Heart className={`w-4 h-4 mr-1 ${channelData.soldOut ? 'text-orange-500' : ''}`} />
               {displayLikes}
             </span>
             <span className="flex items-center">
-              <MessageCircle className="w-4 h-4 mr-1" />
+              <MessageCircle className={`w-4 h-4 mr-1 ${channelData.soldOut ? 'text-orange-500' : ''}`} />
               {comments.length}
             </span>
             <span className="flex items-center">
-              <Eye className="w-4 h-4 mr-1" />
+              <Eye className={`w-4 h-4 mr-1 ${channelData.soldOut ? 'text-orange-500' : ''}`} />
               {formatViews(displayViews)}
             </span>
             <span className="flex items-center">
-              <ShoppingCart className="w-4 h-4 mr-1" />
+              <ShoppingCart className={`w-4 h-4 mr-1 ${channelData.soldOut ? 'text-orange-500' : ''}`} />
               {displaySales} transferred
             </span>
           </div>
@@ -418,12 +421,29 @@ export function ChannelCard({ channel, onBuyNow }: ChannelCardProps) {
         {/* Action Buttons */}
         <div className="space-y-3">
           <Button
-            onClick={() => onBuyNow(channelData)}
-            className="w-full bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white font-bold py-4 rounded-2xl shadow-2xl"
+            onClick={() => {
+              if (channelData.soldOut) {
+                toast({
+                  title: "Service Sold Out 😎",
+                  description: "This service is sold out 😎 Please explore other 😎",
+                  variant: "destructive",
+                });
+                return;
+              }
+              onBuyNow(channelData);
+            }}
+            disabled={channelData.soldOut}
+            className={`w-full font-bold py-4 rounded-2xl shadow-2xl ${
+              channelData.soldOut 
+                ? 'bg-gradient-to-r from-orange-500 to-red-500 cursor-not-allowed opacity-80' 
+                : 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:via-purple-700 hover:to-pink-700'
+            } text-white transition-all duration-300`}
           >
             <div className="flex items-center justify-center">
               <ShoppingCart className="w-5 h-5 mr-2" />
-              <span className="text-lg">Purchase Channel - ₹{Math.floor(channelData.price).toLocaleString()}</span>
+              <span className="text-lg">
+                {channelData.soldOut ? 'SOLD OUT 😎' : `Purchase Channel - ₹${Math.floor(channelData.price).toLocaleString()}`}
+              </span>
             </div>
           </Button>
 

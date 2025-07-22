@@ -558,10 +558,65 @@ export default function SuperAdmin() {
                             </>
                           )}
                           
-                          <Button size="sm" variant="outline">
-                            <Edit3 className="w-4 h-4 mr-1" />
-                            Edit
-                          </Button>
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button size="sm" variant="outline">
+                                <Edit3 className="w-4 h-4 mr-1" />
+                                Edit
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-2xl">
+                              <DialogHeader>
+                                <DialogTitle>Edit Channel</DialogTitle>
+                                <DialogDescription>
+                                  Update channel information
+                                </DialogDescription>
+                              </DialogHeader>
+                              <div className="space-y-4">
+                                <div>
+                                  <Label>Channel Title</Label>
+                                  <Input
+                                    defaultValue={channel.title}
+                                    onChange={(e) => setEditingChannel({...channel, title: e.target.value})}
+                                  />
+                                </div>
+                                <div>
+                                  <Label>Description</Label>
+                                  <Textarea
+                                    defaultValue={channel.description}
+                                    onChange={(e) => setEditingChannel({...channel, description: e.target.value})}
+                                  />
+                                </div>
+                                <div>
+                                  <Label>Price (₹)</Label>
+                                  <Input
+                                    type="number"
+                                    defaultValue={channel.price}
+                                    onChange={(e) => setEditingChannel({...channel, price: parseFloat(e.target.value)})}
+                                  />
+                                </div>
+                              </div>
+                              <DialogFooter>
+                                <Button
+                                  onClick={() => {
+                                    if (editingChannel) {
+                                      fetch(`/api/courses/${channel.id}`, {
+                                        method: 'PUT',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify(editingChannel)
+                                      }).then(() => {
+                                        toast({ title: "✅ Channel Updated Successfully" });
+                                        queryClient.invalidateQueries({ queryKey: ['/api/admin/channels'] });
+                                        setEditingChannel(null);
+                                      });
+                                    }
+                                  }}
+                                >
+                                  Save Changes
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
                           
                           <Button
                             size="sm"
@@ -596,14 +651,41 @@ export default function SuperAdmin() {
                                   Add a special bonus badge to this channel
                                 </DialogDescription>
                               </DialogHeader>
-                              <Input
-                                value={bonusBadgeText}
-                                onChange={(e) => setBonusBadgeText(e.target.value)}
-                                placeholder="Badge text (e.g., 🔥 HOT DEAL)"
-                              />
+                              <div className="space-y-4">
+                                <div>
+                                  <Label>Badge Text</Label>
+                                  <Input
+                                    value={bonusBadgeText}
+                                    onChange={(e) => setBonusBadgeText(e.target.value)}
+                                    placeholder="Badge text (e.g., 🔥 HOT DEAL)"
+                                  />
+                                </div>
+                                <div>
+                                  <Label>Added by: Super Admin</Label>
+                                  <p className="text-sm text-gray-600">This badge will be added by authenticated admin user</p>
+                                </div>
+                              </div>
                               <DialogFooter>
                                 <Button
-                                  onClick={() => handleBonusBadge(channel.id, bonusBadgeText)}
+                                  onClick={() => {
+                                    fetch(`/api/courses/${channel.id}/bonus-badge`, {
+                                      method: 'PUT',
+                                      headers: { 'Content-Type': 'application/json' },
+                                      body: JSON.stringify({ 
+                                        badgeText: bonusBadgeText,
+                                        badgeType: 'admin_special',
+                                        addedBy: 'Super Admin',
+                                        addedAt: new Date().toISOString()
+                                      })
+                                    }).then(() => {
+                                      toast({ 
+                                        title: "🏆 Badge Added Successfully",
+                                        description: `Badge "${bonusBadgeText}" added by Super Admin`
+                                      });
+                                      queryClient.invalidateQueries({ queryKey: ['/api/admin/channels'] });
+                                      setBonusBadgeText("🔥 HOT DEAL");
+                                    });
+                                  }}
                                 >
                                   Add Badge
                                 </Button>
