@@ -24,7 +24,8 @@ export default function Signup() {
     fullName: "",
     email: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
+    phoneNumber: ""
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -104,7 +105,8 @@ export default function Signup() {
                 referredBy: referralCode.trim(),
                 referralSource: 'direct_link',
                 signupDate: now,
-                referredAt: now
+                referredAt: now,
+                phoneNumber: formData.phoneNumber
               });
 
               toast({
@@ -220,6 +222,22 @@ export default function Signup() {
                   placeholder="Enter your email"
                   value={formData.email}
                   onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  className="pl-10"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="phoneNumber">Phone Number 😎</Label>
+              <div className="relative">
+                <span className="absolute left-3 top-3 text-gray-400 text-sm">📱</span>
+                <Input
+                  id="phoneNumber"
+                  type="tel"
+                  placeholder="Enter your phone number"
+                  value={formData.phoneNumber}
+                  onChange={(e) => setFormData({...formData, phoneNumber: e.target.value})}
                   className="pl-10"
                   required
                 />

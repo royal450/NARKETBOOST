@@ -47,6 +47,7 @@ export function ChannelCard({ channel, onBuyNow }: ChannelCardProps) {
   const [showCommentDialog, setShowCommentDialog] = useState(false);
   const [comment, setComment] = useState("");
   const [showCommentsView, setShowCommentsView] = useState(false);
+  const [showFullDescription, setShowFullDescription] = useState(false);
 
 
   // Realistic mixed names with 80% Indian names
@@ -414,12 +415,16 @@ export function ChannelCard({ channel, onBuyNow }: ChannelCardProps) {
             </Badge>
           </div>
 
-          <div className="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400 flex-wrap">
-            <User className="w-3 h-3" />
-            <span>By: {channelData.seller || 'Unknown'}</span>
+          <div className="flex items-center gap-2 text-xs flex-wrap bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/30 dark:to-purple-900/30 px-3 py-2 rounded-lg border border-blue-200/50 dark:border-blue-700/50">
+            <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+              {(channelData.seller || 'U').charAt(0).toUpperCase()}
+            </div>
+            <span className="text-gray-700 dark:text-gray-300 font-medium">
+              By: <span className="text-blue-600 dark:text-blue-400 font-semibold">{channelData.seller || 'Unknown'}</span>
+            </span>
             {channelData.bonusBadge && (
-              <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-1 py-0 text-xs ml-1">
-                PRO SELLER
+              <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-2 py-1 text-xs animate-pulse border-0">
+                ⭐ PRO SELLER
               </Badge>
             )}
           </div>
@@ -441,10 +446,20 @@ export function ChannelCard({ channel, onBuyNow }: ChannelCardProps) {
           )}
         </div>
 
-        {/* Description */}
-        <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-2 leading-relaxed">
-          {channelData.description}
-        </p>
+        {/* Description with Read More */}
+        <div className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
+          <p className={`${showFullDescription ? '' : 'line-clamp-2'}`}>
+            {channelData.description}
+          </p>
+          {channelData.description && channelData.description.length > 100 && (
+            <button
+              onClick={() => setShowFullDescription(!showFullDescription)}
+              className="text-purple-600 hover:text-purple-700 font-medium mt-1 text-xs"
+            >
+              {showFullDescription ? '↑ Read Less' : '↓ Read More'}
+            </button>
+          )}
+        </div>
 
         {/* Enhanced Stats Grid with More Info */}
         <div className="grid grid-cols-2 gap-2 py-2 border-t border-b border-gray-200 dark:border-gray-700">

@@ -796,14 +796,20 @@ export default function SuperAdmin() {
             </div>
           </TabsContent>
 
-          {/* Users Management Tab */}
+          {/* Users Management Tab - Enhanced */}
           <TabsContent value="users" className="space-y-6">
             <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold">User Management</h2>
-              <Button>
-                <Gift className="w-4 h-4 mr-2" />
-                Bulk Bonus
-              </Button>
+              <h2 className="text-2xl font-bold">User Management - Real-time Data 😎</h2>
+              <div className="flex gap-2">
+                <Button>
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Refresh Data
+                </Button>
+                <Button>
+                  <Gift className="w-4 h-4 mr-2" />
+                  Bulk Bonus
+                </Button>
+              </div>
             </div>
 
             <div className="grid gap-4">
@@ -814,36 +820,120 @@ export default function SuperAdmin() {
                 </Card>
               ) : (
                 users.map((user) => (
-                  <Card key={user.id} className="p-6">
-                    <div className="flex items-center justify-between">
+                  <Card key={user.id} className="p-6 bg-gradient-to-r from-white to-blue-50 dark:from-gray-800 dark:to-blue-900/30 border-l-4 border-blue-500">
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold">
+                        <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
                           {user.displayName?.charAt(0) || user.email.charAt(0).toUpperCase()}
                         </div>
-                        <div>
-                          <h3 className="font-semibold">{user.displayName || 'Unknown'}</h3>
-                          <p className="text-gray-600 text-sm">{user.email}</p>
-                          <div className="flex items-center gap-4 mt-1 text-sm text-gray-500">
-                            <span>Wallet: ₹{user.walletBalance || 0}</span>
-                            <span>Referrals: {user.totalReferrals || 0}</span>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-bold text-lg text-gray-900 dark:text-white">
+                              {user.displayName || 'Unknown User'}
+                            </h3>
+                            <Badge className="bg-green-500 text-white">
+                              {user.status || 'Active'}
+                            </Badge>
+                          </div>
+                          <p className="text-gray-600 dark:text-gray-300 font-medium">{user.email}</p>
+                          {user.phoneNumber && (
+                            <p className="text-blue-600 dark:text-blue-400 text-sm flex items-center gap-1">
+                              📱 {user.phoneNumber}
+                            </p>
+                          )}
+                          
+                          {/* Real-time Stats Grid */}
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3">
+                            <div className="bg-green-100 dark:bg-green-900/30 p-2 rounded-lg text-center">
+                              <div className="text-lg font-bold text-green-700 dark:text-green-400">
+                                ₹{user.walletBalance || 0}
+                              </div>
+                              <div className="text-xs text-green-600 dark:text-green-500">Wallet</div>
+                            </div>
+                            
+                            <div className="bg-purple-100 dark:bg-purple-900/30 p-2 rounded-lg text-center">
+                              <div className="text-lg font-bold text-purple-700 dark:text-purple-400">
+                                {user.totalReferrals || 0}
+                              </div>
+                              <div className="text-xs text-purple-600 dark:text-purple-500">Referrals</div>
+                            </div>
+                            
+                            <div className="bg-blue-100 dark:bg-blue-900/30 p-2 rounded-lg text-center">
+                              <div className="text-lg font-bold text-blue-700 dark:text-blue-400">
+                                {user.totalPurchases || 0}
+                              </div>
+                              <div className="text-xs text-blue-600 dark:text-blue-500">Purchases</div>
+                            </div>
+                            
+                            <div className="bg-orange-100 dark:bg-orange-900/30 p-2 rounded-lg text-center">
+                              <div className="text-lg font-bold text-orange-700 dark:text-orange-400">
+                                ₹{user.totalSpent || 0}
+                              </div>
+                              <div className="text-xs text-orange-600 dark:text-orange-500">Total Spent</div>
+                            </div>
+                          </div>
+
+                          {/* User Activity Timeline */}
+                          <div className="mt-3 text-xs text-gray-500 dark:text-gray-400">
+                            <div className="flex items-center gap-4 flex-wrap">
+                              <span className="flex items-center gap-1">
+                                <Calendar className="w-3 h-3" />
+                                Joined: {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Activity className="w-3 h-3" />
+                                Last Active: {user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : 'N/A'}
+                              </span>
+                              {user.referredBy && (
+                                <span className="flex items-center gap-1 text-green-600 dark:text-green-400">
+                                  <Share2 className="w-3 h-3" />
+                                  Referred by: {user.referredBy}
+                                </span>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>
-                      <div className="flex gap-2">
-                        <Button size="sm" variant="outline">
+                      
+                      {/* Action Buttons */}
+                      <div className="flex flex-wrap gap-2">
+                        <Button size="sm" variant="outline" className="bg-green-50 hover:bg-green-100 text-green-700 border-green-300">
                           <Gift className="w-4 h-4 mr-1" />
                           Give Bonus
                         </Button>
-                        <Button size="sm" variant="outline">
+                        <Button size="sm" variant="outline" className="bg-yellow-50 hover:bg-yellow-100 text-yellow-700 border-yellow-300">
                           <Award className="w-4 h-4 mr-1" />
                           Give Badge
                         </Button>
-                        <Button size="sm" variant="outline">
+                        <Button size="sm" variant="outline" className="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-300">
+                          <Eye className="w-4 h-4 mr-1" />
+                          View Details
+                        </Button>
+                        <Button size="sm" variant="outline" className="bg-red-50 hover:bg-red-100 text-red-700 border-red-300">
                           <Ban className="w-4 h-4 mr-1" />
                           Block User
                         </Button>
                       </div>
                     </div>
+
+                    {/* Purchase History Preview */}
+                    {user.recentPurchases && user.recentPurchases.length > 0 && (
+                      <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                        <h4 className="font-semibold text-sm mb-2 text-gray-700 dark:text-gray-300">Recent Purchases:</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {user.recentPurchases.slice(0, 3).map((purchase: any, index: number) => (
+                            <Badge key={index} variant="outline" className="bg-purple-50 text-purple-700 border-purple-300">
+                              {purchase.title} - ₹{purchase.price}
+                            </Badge>
+                          ))}
+                          {user.recentPurchases.length > 3 && (
+                            <Badge variant="outline" className="bg-gray-50 text-gray-700">
+                              +{user.recentPurchases.length - 3} more
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </Card>
                 ))
               )}

@@ -39,6 +39,12 @@ const channelSubmissionSchema = z.object({
   marketingPrice: z.number().optional(),
   customCategory: z.string().optional(),
   customServiceType: z.string().optional(),
+  deliveryMethod: z.enum(['chat', 'call', 'conference_call', 'whatsapp_video'], {
+    required_error: "Please select delivery method"
+  }),
+  paymentSystem: z.enum(['upi', 'bank', 'crypto_usd'], {
+    required_error: "Please select payment system"
+  }),
 });
 
 type ChannelSubmissionForm = z.infer<typeof channelSubmissionSchema>;
@@ -70,6 +76,21 @@ const reputationLevels = [
   { value: '1_strike', label: '1 Strike', color: 'bg-yellow-500' },
   { value: '2_strikes', label: '2 Strikes', color: 'bg-orange-500' },
   { value: '3_strikes', label: '3 Strikes (Final Warning)', color: 'bg-red-500' },
+];
+
+// Delivery methods
+const deliveryMethods = [
+  { value: 'chat', label: 'Chat Support', description: 'Text-based communication' },
+  { value: 'call', label: 'Voice Call', description: 'Audio call support' },
+  { value: 'conference_call', label: 'Conference Call (Admin + Client + Me)', description: 'Three-way call with admin' },
+  { value: 'whatsapp_video', label: 'WhatsApp Video Call', description: 'Video call via WhatsApp' },
+];
+
+// Payment systems
+const paymentSystems = [
+  { value: 'upi', label: 'UPI', description: 'Unified Payments Interface' },
+  { value: 'bank', label: 'Bank Transfer', description: 'Direct bank account transfer' },
+  { value: 'crypto_usd', label: 'Crypto (USD Only)', description: 'Cryptocurrency payments in USD' },
 ];
 
 // Auto-thumbnail fetching function based on category
@@ -170,6 +191,8 @@ export default function ChannelCreation() {
         screenshots: screenshots,
         thumbnail: autoThumbnail,
         seller: user.displayName || user.email || 'Anonymous',
+        deliveryMethod: data.deliveryMethod,
+        paymentSystem: data.paymentSystem,
         instructorId: user.uid,
         platform: data.serviceType === 'other' ? data.customServiceType : data.serviceType,
         approvalStatus: 'pending',
@@ -520,6 +543,72 @@ export default function ChannelCreation() {
                     </div>
                     {errors.trustedLevel && (
                       <p className="text-red-500 text-sm mt-1">{errors.trustedLevel.message}</p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Delivery & Payment */}
+              <Card className="shadow-lg border-0 bg-white/90 backdrop-blur">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <MessageSquare className="w-5 h-5 text-blue-600" />
+                    Delivery & Payment Methods
+                  </CardTitle>
+                  <CardDescription>
+                    How you'll deliver your service and receive payments
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Delivery Method */}
+                  <div>
+                    <Label>After Sale - How You'll Deliver Service *</Label>
+                    <Select 
+                      onValueChange={(value) => setValue('deliveryMethod', value as any)}
+                      defaultValue={watchedValues.deliveryMethod}
+                    >
+                      <SelectTrigger className="mt-1">
+                        <SelectValue placeholder="Select delivery method" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {deliveryMethods.map((method) => (
+                          <SelectItem key={method.value} value={method.value}>
+                            <div className="flex flex-col">
+                              <span>{method.label}</span>
+                              <span className="text-xs text-gray-500">{method.description}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {errors.deliveryMethod && (
+                      <p className="text-red-500 text-sm mt-1">{errors.deliveryMethod.message}</p>
+                    )}
+                  </div>
+
+                  {/* Payment System */}
+                  <div>
+                    <Label>Your Payment System *</Label>
+                    <Select 
+                      onValueChange={(value) => setValue('paymentSystem', value as any)}
+                      defaultValue={watchedValues.paymentSystem}
+                    >
+                      <SelectTrigger className="mt-1">
+                        <SelectValue placeholder="Select payment system" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {paymentSystems.map((system) => (
+                          <SelectItem key={system.value} value={system.value}>
+                            <div className="flex flex-col">
+                              <span>{system.label}</span>
+                              <span className="text-xs text-gray-500">{system.description}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {errors.paymentSystem && (
+                      <p className="text-red-500 text-sm mt-1">{errors.paymentSystem.message}</p>
                     )}
                   </div>
                 </CardContent>
