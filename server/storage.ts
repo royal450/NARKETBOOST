@@ -170,6 +170,9 @@ export class MemStorage implements IStorage {
         engagementRate: 8.5,
         verificationStatus: "verified",
         platform: "youtube",
+        serviceType: "youtube",
+        reputation: "new",
+        monetizationStatus: "monetized",
         createdAt: new Date(),
         approvedAt: new Date(),
         approvedBy: "admin",
@@ -209,6 +212,9 @@ export class MemStorage implements IStorage {
         engagementRate: 6.2,
         verificationStatus: "verified",
         platform: "instagram",
+        serviceType: "instagram", 
+        reputation: "new",
+        monetizationStatus: "non_monetized",
         createdAt: new Date(),
         approvedAt: new Date(),
         approvedBy: "admin",
@@ -248,6 +254,9 @@ export class MemStorage implements IStorage {
         engagementRate: 15.0,
         verificationStatus: "verified",
         platform: "discord",
+        serviceType: "other",
+        reputation: "new", 
+        monetizationStatus: "non_monetized",
         createdAt: new Date(),
         approvedAt: new Date(),
         approvedBy: "admin",
@@ -354,6 +363,9 @@ export class MemStorage implements IStorage {
       engagementRate: courseData.engagementRate || 0,
       verificationStatus: "unverified",
       platform: courseData.platform || "youtube",
+      serviceType: courseData.serviceType || "youtube",
+      reputation: courseData.reputation || "new",
+      monetizationStatus: courseData.monetizationStatus || "non_monetized",
       createdAt: new Date(),
       approvedAt: null,
       approvedBy: null,
@@ -374,8 +386,11 @@ export class MemStorage implements IStorage {
   }
 
   async updateCourse(courseId: string, updates: any): Promise<Channel> {
-    const course = this.courses.get(courseId);
+    // Handle both string and numeric IDs
+    const course = this.courses.get(courseId) || this.courses.get(parseInt(courseId).toString());
     if (!course) {
+      console.log(`Course not found with ID: ${courseId}`);
+      console.log('Available courses:', Array.from(this.courses.keys()));
       throw new Error("Course not found");
     }
 

@@ -162,13 +162,16 @@ export default function ChannelCreation() {
         serviceUrl: data.serviceUrl,
         serviceName: data.serviceName,
         followersCount: data.followersCount,
+        followerCount: data.followersCount, // For backward compatibility
         monetizationStatus: data.monetizationStatus,
+        monetized: data.monetizationStatus === 'monetized', // For backward compatibility
         reputation: data.reputation,
         trustedLevel: data.trustedLevel,
         screenshots: screenshots,
         thumbnail: autoThumbnail,
         seller: user.displayName || user.email || 'Anonymous',
         instructorId: user.uid,
+        platform: data.serviceType === 'other' ? data.customServiceType : data.serviceType,
         approvalStatus: 'pending',
         status: 'pending',
         blocked: false,

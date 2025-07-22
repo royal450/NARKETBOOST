@@ -295,6 +295,31 @@ export function ChannelCard({ channel, onBuyNow }: ChannelCardProps) {
   const displayRating = parseFloat(realTimeRating); // Ensure rating is between 1.1 and 5.0
   const finalRating = Math.min(Math.max(displayRating, 1.1), 5.0);
 
+  // Get service type specific follower label
+  const getFollowerLabel = (serviceType: string) => {
+    switch(serviceType) {
+      case 'youtube': return 'Subscribers';
+      case 'instagram': return 'Followers';
+      case 'facebook': return 'Followers'; 
+      case 'telegram': return 'Members';
+      case 'reels': return 'Followers';
+      case 'video': return 'Followers';
+      case 'tools': return 'Users';
+      default: return 'Followers';
+    }
+  };
+
+  // Get strike color and text
+  const getStrikeInfo = (reputation: string) => {
+    switch(reputation) {
+      case 'new': return { color: 'bg-green-500', text: '0 Strikes', textColor: 'text-green-700' };
+      case '1_strike': return { color: 'bg-yellow-500', text: '1 Strike', textColor: 'text-yellow-700' };
+      case '2_strikes': return { color: 'bg-orange-500', text: '2 Strikes', textColor: 'text-orange-700' };
+      case '3_strikes': return { color: 'bg-red-500', text: '3 Strikes', textColor: 'text-red-700' };
+      default: return { color: 'bg-gray-500', text: 'Unknown', textColor: 'text-gray-700' };
+    }
+  };
+
   const formatViews = (views: number) => {
     if (views >= 1000000) return `${Math.floor(views / 1000000)}M`;
     if (views >= 1000) return `${Math.floor(views / 1000)}K`;
@@ -379,19 +404,17 @@ export function ChannelCard({ channel, onBuyNow }: ChannelCardProps) {
               </Badge>
             )}
           </div>
-          {/* Category & Monetization Status */}
-          <div className="flex items-center gap-2 text-xs mb-1">
+          {/* Service Type & Monetization Status */}
+          <div className="flex items-center gap-2 text-xs mb-1 flex-wrap">
             <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 px-2 py-0.5">
-              📱 {channelData.category || 'General'}
+              📱 {channelData.serviceType || channelData.category || 'General'}
             </Badge>
-            {channelData.monetized && (
-              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 px-2 py-0.5">
-                💰 Monetized
-              </Badge>
-            )}
+            <Badge variant="outline" className={channelData.monetizationStatus === 'monetized' ? 'bg-yellow-50 text-yellow-800 border-yellow-300' : 'bg-gray-50 text-gray-700 border-gray-200'} style={{ backgroundColor: channelData.monetizationStatus === 'monetized' ? '#fef3c7' : undefined }}>
+              {channelData.monetizationStatus === 'monetized' ? '💰 Monetized' : '⏳ Non-Monetized'}
+            </Badge>
           </div>
           
-          <div className="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400">
+          <div className="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400 flex-wrap">
             <User className="w-3 h-3" />
             <span>By: {channelData.seller || 'Unknown'}</span>
             {channelData.bonusBadge && (
@@ -400,6 +423,16 @@ export function ChannelCard({ channel, onBuyNow }: ChannelCardProps) {
               </Badge>
             )}
           </div>
+          
+          {/* Strike Information */}
+          {channelData.reputation && (
+            <div className="flex items-center gap-1 text-xs mt-1">
+              <div className={`w-2 h-2 rounded-full ${getStrikeInfo(channelData.reputation).color}`}></div>
+              <span className={getStrikeInfo(channelData.reputation).textColor}>
+                {getStrikeInfo(channelData.reputation).text}
+              </span>
+            </div>
+          )}
           {channelData.bonusBadge && (
             <div className="mt-1 text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
               <Award className="w-3 h-3" />
@@ -431,7 +464,9 @@ export function ChannelCard({ channel, onBuyNow }: ChannelCardProps) {
             <div className="font-semibold text-green-600 dark:text-green-400">
               {channelData.followerCount ? formatViews(channelData.followerCount) : '0'}
             </div>
-            <div className="text-gray-500 dark:text-gray-400">Subscribers</div>
+            <div className="text-gray-500 dark:text-gray-400">
+              {getFollowerLabel(channelData.serviceType || channelData.category || 'youtube')}
+            </div>
           </div>
           <div className="text-center">
             <div className="font-semibold text-orange-600 dark:text-orange-400">

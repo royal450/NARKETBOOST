@@ -42,6 +42,9 @@ export const channels = pgTable("channels", {
   engagementRate: real("engagement_rate").default(0),
   verificationStatus: text("verification_status").default("unverified"), // 'verified' | 'unverified' | 'pending'
   platform: text("platform").notNull(), // 'instagram' | 'youtube' | 'facebook' | 'tiktok' | 'twitter' | 'linkedin' | 'telegram'
+  serviceType: text("service_type"), // 'youtube', 'instagram', 'facebook', 'telegram', 'reels', 'video', 'tools', 'other'
+  reputation: text("reputation").default("new"), // 'new', '1_strike', '2_strikes', '3_strikes'
+  monetizationStatus: text("monetization_status").default("non_monetized"), // 'monetized', 'non_monetized'
   createdAt: timestamp("created_at").defaultNow(),
   approvedAt: timestamp("approved_at"),
   approvedBy: text("approved_by"),
