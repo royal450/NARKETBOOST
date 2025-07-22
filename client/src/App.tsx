@@ -27,6 +27,13 @@ const FullFeaturedAdmin = lazy(() => import("@/pages/full-featured-admin"));
 const ChannelShowCard = lazy(() => import("@/pages/channel-show-full-attractive-card"));
 const EnhancedChannelSubmission = lazy(() => import("@/pages/enhanced-channel-submission"));
 
+// Lazy loaded new pages
+const ProfileNew = lazy(() => import("@/pages/profile-new"));
+const SignupFixed = lazy(() => import("@/pages/signup-fixed"));
+const UserProfileNew = lazy(() => import("@/pages/user-profile"));
+const UserProfileAlt = lazy(() => import("@/pages/userprofile"));
+const WithdrawalPopup = lazy(() => import("@/pages/withdrawal-popup"));
+
 function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
   const { user, loading } = useAuth();
   const [, setLocation] = useLocation();
@@ -260,6 +267,31 @@ export default function App() {
         <Route path="/" component={AutoRedirectRoute} />
         <Route path="/not-found" component={NotFound} />
         <Route path="/withdrawal" component={Withdrawal} />
+        <Route path="/profile-new">
+          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
+            <ProtectedRoute component={ProfileNew} />
+          </Suspense>
+        </Route>
+        <Route path="/signup-fixed">
+          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
+            <PublicRoute component={SignupFixed} />
+          </Suspense>
+        </Route>
+        <Route path="/user-profile-new/:userId">
+          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
+            <ProtectedRoute component={UserProfileNew} />
+          </Suspense>
+        </Route>
+        <Route path="/userprofile/:userId">
+          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
+            <ProtectedRoute component={UserProfileAlt} />
+          </Suspense>
+        </Route>
+        <Route path="/withdrawal-popup">
+          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
+            <ProtectedRoute component={WithdrawalPopup} />
+          </Suspense>
+        </Route>
         <Route component={NotFound} />
       </Switch>
       <Toaster />
