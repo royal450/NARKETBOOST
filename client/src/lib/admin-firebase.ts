@@ -71,6 +71,25 @@ export const adminOperations = {
     }
   },
 
+  // Update service with any data
+  updateService: async (serviceId: string, updates: any) => {
+    try {
+      console.log('Updating service:', serviceId, 'Updates:', updates);
+      const serviceRef = ref(database, `services/${serviceId}`);
+      const updateData = {
+        ...updates,
+        lastUpdated: serverTimestamp()
+      };
+      
+      await update(serviceRef, updateData);
+      console.log('Service updated successfully');
+      return { success: true };
+    } catch (error) {
+      console.error('Error updating service:', error);
+      throw error;
+    }
+  },
+
   // Delete service from Firebase
   deleteService: async (serviceId: string) => {
     try {

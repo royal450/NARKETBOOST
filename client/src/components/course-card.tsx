@@ -413,8 +413,8 @@ export function ChannelCard({ channel, onBuyNow }: ChannelCardProps) {
           {channelData.description}
         </p>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-3 gap-2 py-2 border-t border-b border-gray-200 dark:border-gray-700">
+        {/* Enhanced Stats Grid with More Info */}
+        <div className="grid grid-cols-2 gap-2 py-2 border-t border-b border-gray-200 dark:border-gray-700">
           <div className="text-center">
             <div className="text-sm font-bold text-purple-600 dark:text-purple-400">{displayLikes}</div>
             <div className="text-xs text-gray-500 dark:text-gray-400">Likes</div>
@@ -423,9 +423,21 @@ export function ChannelCard({ channel, onBuyNow }: ChannelCardProps) {
             <div className="text-sm font-bold text-blue-600 dark:text-blue-400">{formatViews(displayViews)}</div>
             <div className="text-xs text-gray-500 dark:text-gray-400">Views</div>
           </div>
+        </div>
+        
+        {/* Additional Channel Info */}
+        <div className="grid grid-cols-2 gap-2 py-1 text-xs">
           <div className="text-center">
-            <div className="text-sm font-bold text-green-600 dark:text-green-400">{displaySales}</div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">Sales</div>
+            <div className="font-semibold text-green-600 dark:text-green-400">
+              {channelData.followerCount ? formatViews(channelData.followerCount) : '0'}
+            </div>
+            <div className="text-gray-500 dark:text-gray-400">Subscribers</div>
+          </div>
+          <div className="text-center">
+            <div className="font-semibold text-orange-600 dark:text-orange-400">
+              {channelData.engagementRate || '0'}%
+            </div>
+            <div className="text-gray-500 dark:text-gray-400">Engagement</div>
           </div>
         </div>
 

@@ -227,15 +227,17 @@ export default function SuperAdmin() {
   const handleBonusBadge = async (channelId: string, badgeText?: string) => {
     try {
       if (badgeText) {
-        await adminOperations.updateServiceMarketing(channelId, { 
+        await adminOperations.updateService(channelId, { 
           bonusBadge: badgeText,
+          badgeText: badgeText,
           badgeType: 'admin_special',
           addedBy: 'Super Admin',
           badgeAddedAt: new Date().toISOString()
         });
       } else {
-        await adminOperations.updateServiceMarketing(channelId, { 
+        await adminOperations.updateService(channelId, { 
           bonusBadge: null,
+          badgeText: null,
           badgeType: null,
           addedBy: null,
           badgeAddedAt: null
@@ -309,15 +311,15 @@ export default function SuperAdmin() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-6 shadow-lg">
-        <div className="container mx-auto">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Crown className="w-8 h-8 text-yellow-300" />
+      {/* Header - Mobile Responsive */}
+      <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-3 md:p-6 shadow-lg">
+        <div className="w-full max-w-full mx-auto">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+            <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-0">
+              <Crown className="w-6 h-6 md:w-8 md:h-8 text-yellow-300" />
               <div>
-                <h1 className="text-3xl font-bold">Super Admin Dashboard</h1>
-                <p className="text-purple-100">Complete control & management system</p>
+                <h1 className="text-lg md:text-3xl font-bold">Super Admin Dashboard</h1>
+                <p className="text-sm md:text-base text-purple-100">Complete control & management system</p>
               </div>
             </div>
             <Button
@@ -334,29 +336,32 @@ export default function SuperAdmin() {
 
       <div className="container mx-auto px-4 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid grid-cols-6 w-full max-w-4xl mx-auto">
-            <TabsTrigger value="overview" className="flex items-center gap-2">
-              <BarChart3 className="w-4 h-4" />
-              Overview
+          <TabsList className="grid grid-cols-3 md:grid-cols-6 w-full h-auto">
+            <TabsTrigger value="overview" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm">
+              <BarChart3 className="w-3 h-3 md:w-4 md:h-4" />
+              <span className="hidden md:inline">Overview</span>
+              <span className="md:hidden">Stats</span>
             </TabsTrigger>
-            <TabsTrigger value="channels" className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4" />
-              Channels
+            <TabsTrigger value="channels" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm">
+              <TrendingUp className="w-3 h-3 md:w-4 md:h-4" />
+              <span className="hidden md:inline">Channels</span>
+              <span className="md:hidden">Ch.</span>
             </TabsTrigger>
-            <TabsTrigger value="users" className="flex items-center gap-2">
-              <Users className="w-4 h-4" />
-              Users
+            <TabsTrigger value="users" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm">
+              <Users className="w-3 h-3 md:w-4 md:h-4" />
+              <span className="hidden md:inline">Users</span>
+              <span className="md:hidden">Users</span>
             </TabsTrigger>
-            <TabsTrigger value="referrals" className="flex items-center gap-2">
-              <Share2 className="w-4 h-4" />
+            <TabsTrigger value="referrals" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm hidden md:flex">
+              <Share2 className="w-3 h-3 md:w-4 md:h-4" />
               Referrals
             </TabsTrigger>
-            <TabsTrigger value="withdrawals" className="flex items-center gap-2">
-              <DollarSign className="w-4 h-4" />
+            <TabsTrigger value="withdrawals" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm hidden md:flex">
+              <DollarSign className="w-3 h-3 md:w-4 md:h-4" />
               Withdrawals
             </TabsTrigger>
-            <TabsTrigger value="controls" className="flex items-center gap-2">
-              <Settings className="w-4 h-4" />
+            <TabsTrigger value="controls" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm hidden md:flex">
+              <Settings className="w-3 h-3 md:w-4 md:h-4" />
               Controls
             </TabsTrigger>
           </TabsList>
@@ -464,18 +469,18 @@ export default function SuperAdmin() {
               </div>
             </div>
 
-            <div className="grid gap-6">
+            <div className="grid gap-3 md:gap-6">
               {allChannels.map((channel) => (
                 <Card key={channel.id} className="shadow-lg hover:shadow-xl transition-shadow">
-                  <CardContent className="p-6">
-                    <div className="flex items-start gap-4">
+                  <CardContent className="p-3 md:p-6">
+                    <div className="flex flex-col md:flex-row md:items-start gap-3 md:gap-4">
                       <img
                         src={channel.thumbnail || '/placeholder-thumbnail.jpg'}
                         alt={channel.title}
-                        className="w-24 h-16 object-cover rounded-lg"
+                        className="w-full h-32 md:w-24 md:h-16 object-cover rounded-lg"
                       />
                       <div className="flex-1">
-                        <div className="flex items-start justify-between">
+                        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-2 md:gap-0">
                           <div>
                             <h3 className="font-semibold text-lg">{channel.title}</h3>
                             <p className="text-gray-600 text-sm">{channel.description}</p>
@@ -546,21 +551,21 @@ export default function SuperAdmin() {
                           </div>
                         </div>
 
-                        <div className="flex flex-wrap gap-2 mt-4">
+                        <div className="flex flex-wrap gap-1 md:gap-2 mt-3 md:mt-4">
                           {(channel.status === 'pending' || channel.approvalStatus === 'pending') && (
                             <>
                               <Button
                                 size="sm"
                                 onClick={() => handleApproveService(channel.id)}
-                                className="bg-green-500 hover:bg-green-600"
+                                className="bg-green-500 hover:bg-green-600 text-xs md:text-sm px-2 md:px-3 py-1 md:py-2"
                               >
-                                <CheckCircle className="w-4 h-4 mr-1" />
+                                <CheckCircle className="w-3 h-3 md:w-4 md:h-4 mr-1" />
                                 Approve
                               </Button>
                               <Dialog>
                                 <DialogTrigger asChild>
-                                  <Button size="sm" variant="destructive">
-                                    <XCircle className="w-4 h-4 mr-1" />
+                                  <Button size="sm" variant="destructive" className="text-xs md:text-sm px-2 md:px-3 py-1 md:py-2">
+                                    <XCircle className="w-3 h-3 md:w-4 md:h-4 mr-1" />
                                     Reject
                                   </Button>
                                 </DialogTrigger>
