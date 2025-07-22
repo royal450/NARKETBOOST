@@ -6,24 +6,16 @@ import { AuthProvider } from "@/hooks/use-auth";
 import { useAuth } from "@/hooks/use-auth";
 import { Toaster } from "@/components/ui/toaster";
 import Dashboard from "@/pages/dashboard";
-import DashboardAbroad from "@/pages/dashboard-abroad";
 import Login from "@/pages/login";
 import Signup from "@/pages/signup";
 import Payment from "@/pages/payment";
 import Profile from "@/pages/profile";
-
-import AdminPanel from "@/pages/admin";
 import Referral from "@/pages/referral";
 import NotFound from "@/pages/not-found";
 import Withdrawal from "@/pages/withdrawal";
+import WithdrawalPopup from "@/pages/withdrawal-popup";
 
-// Lazy loaded channel pages
-const ChannelCreationModern = lazy(() => import("@/pages/channel-creation-modern"));
-const FullFeaturedAdmin = lazy(() => import("@/pages/full-featured-admin"));
-const ChannelShowCard = lazy(() => import("@/pages/channel-show-full-attractive-card"));
-const EnhancedChannelSubmission = lazy(() => import("@/pages/enhanced-channel-submission"));
-
-// Lazy loaded new pages
+// Lazy loaded admin and channel pages
 const SuperAdmin = lazy(() => import("@/pages/Super_Admin"));
 const ChannelCreation = lazy(() => import("@/pages/Channel_Creation"));
 
@@ -69,7 +61,7 @@ function PublicRoute({ component: Component }: { component: React.ComponentType 
   return !user ? <Component /> : null;
 }
 
-// Auto-redirect for authenticated users with location detection
+// Auto-redirect for authenticated users
 function AutoRedirectRoute() {
   const { user, loading } = useAuth();
   const [, setLocation] = useLocation();
@@ -77,13 +69,7 @@ function AutoRedirectRoute() {
   useEffect(() => {
     if (!loading) {
       if (user) {
-        // Check user location to determine dashboard
-        const userLocation = (user as any)?.location || "India";
-        if (userLocation === "India") {
-          setLocation("/dashboard");
-        } else {
-          setLocation("/dashboard-abroad");
-        }
+        setLocation("/dashboard");
       } else {
         setLocation("/login");
       }
@@ -99,36 +85,6 @@ function AutoRedirectRoute() {
   }
 
   return null;
-}
-
-// Location-based dashboard route
-function DashboardRoute() {
-  const { user, loading } = useAuth();
-  const [, setLocation] = useLocation();
-
-  useEffect(() => {
-    if (!loading && !user) {
-      setLocation("/login");
-    }
-  }, [user, loading, setLocation]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
-
-  if (!user) return null;
-
-  // Check user location to determine which dashboard to show
-  const userLocation = (user as any)?.location || "India";
-  if (userLocation === "India") {
-    return <Dashboard />;
-  } else {
-    return <DashboardAbroad />;
-  }
 }
 
 // Enhanced Referral Detection Component  
@@ -161,11 +117,11 @@ function ReferralDetector() {
       }
     }
 
-    // Store referral code if found and show detection
+    // Store referral code if found
     if (referralCode && referralCode.trim()) {
       localStorage.setItem('referralCode', referralCode.trim());
       localStorage.setItem('referralDetected', 'true');
-      console.log('✅ Referral code detected and stored:', referralCode.trim());
+      console.log('✅ Referral code detected:', referralCode.trim());
 
       // Show success toast
       setTimeout(() => {
@@ -173,134 +129,62 @@ function ReferralDetector() {
           detail: { code: referralCode.trim() } 
         }));
       }, 500);
-    }
 
-    // Redirect based on authentication status
-    if (user) {
-      setLocation('/dashboard');
-    } else {
-      setLocation('/signup');
+      // Redirect authenticated users to dashboard
+      if (user) {
+        setLocation("/dashboard");
+      } else {
+        setLocation("/signup");
+      }
     }
-  }, [setLocation, user]);
+  }, [user, setLocation]);
 
   return null;
 }
 
-export default function App() {
+function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
+        <ReferralDetector />
         <Switch>
-        <Route path="/login">
-          <PublicRoute component={Login} />
-        </Route>
-        <Route path="/signup">
-          <PublicRoute component={Signup} />
-        </Route>
-        <Route path="/refer" component={ReferralDetector} />
-        <Route path="/channel/:id" component={ReferralDetector} />
-        <Route path="/course/:id" component={ReferralDetector} />
-        <Route path="/dashboard" component={DashboardRoute} />
-        <Route path="/dashboard-abroad">
-          <ProtectedRoute component={DashboardAbroad} />
-        </Route>
-        <Route path="/profile">
-          <ProtectedRoute component={Profile} />
-        </Route>
-        <Route path="/my-channels">
-          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
-            <ProtectedRoute component={EnhancedChannelSubmission} />
-          </Suspense>
-        </Route>
-        <Route path="/my-courses">
-          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
-            <ProtectedRoute component={EnhancedChannelSubmission} />
-          </Suspense>
-        </Route>
-        <Route path="/user-profile/:userId">
-          <ProtectedRoute component={Profile} />
-        </Route>
-        <Route path="/payment">
-          <ProtectedRoute component={Payment} />
-        </Route>
-        <Route path="/list-channel">
-          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
-            <ProtectedRoute component={EnhancedChannelSubmission} />
-          </Suspense>
-        </Route>
-        <Route path="/promotion">
-          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
-            <ProtectedRoute component={ChannelCreationModern} />
-          </Suspense>
-        </Route>
-        <Route path="/create-course">
-          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
-            <ProtectedRoute component={EnhancedChannelSubmission} />
-          </Suspense>
-        </Route>
-        <Route path="/super-admin">
-          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
-            <SuperAdmin />
-          </Suspense>
-        </Route>
-        <Route path="/channel-creation">
-          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
-            <ProtectedRoute component={ChannelCreation} />
-          </Suspense>
-        </Route>
-        <Route path="/channel-creation">
-          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
-            <ProtectedRoute component={ChannelCreationModern} />
-          </Suspense>
-        </Route>
-        <Route path="/create-channel">
-          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
-            <ProtectedRoute component={ChannelCreationModern} />
-          </Suspense>
-        </Route>
-        <Route path="/submit-channel">
-          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
-            <ProtectedRoute component={EnhancedChannelSubmission} />
-          </Suspense>
-        </Route>
-        <Route path="/enhanced-channel-submission">
-          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
-            <ProtectedRoute component={EnhancedChannelSubmission} />
-          </Suspense>
-        </Route>
-        <Route path="/channel-submission">
-          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
-            <ProtectedRoute component={EnhancedChannelSubmission} />
-          </Suspense>
-        </Route>
-        <Route path="/channels">
-          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
-            <ChannelShowCard />
-          </Suspense>
-        </Route>
-        <Route path="/channel-marketplace">
-          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
-            <ChannelShowCard />
-          </Suspense>
-        </Route>
-        <Route path="/payment/:channelId">
-          <ProtectedRoute component={Payment} />
-        </Route>
-        <Route path="/payment/:courseId">
-          <ProtectedRoute component={Payment} />
-        </Route>
-        <Route path="/r/:code" component={ReferralDetector} />
-        <Route path="/invite/:code" component={ReferralDetector} />
-        <Route path="/inviteCode*" component={ReferralDetector} />
-        
-
-        <Route path="/" component={AutoRedirectRoute} />
-        <Route path="/not-found" component={NotFound} />
-        <Route path="/withdrawal" component={Withdrawal} />
-        <Route component={NotFound} />
-      </Switch>
-      <Toaster />
+          {/* Root redirect */}
+          <Route path="/" component={AutoRedirectRoute} />
+          
+          {/* Public routes */}
+          <Route path="/login" component={() => <PublicRoute component={Login} />} />
+          <Route path="/signup" component={() => <PublicRoute component={Signup} />} />
+          
+          {/* Protected routes */}
+          <Route path="/dashboard" component={() => <ProtectedRoute component={Dashboard} />} />
+          <Route path="/payment" component={() => <ProtectedRoute component={Payment} />} />
+          <Route path="/profile" component={() => <ProtectedRoute component={Profile} />} />
+          <Route path="/referral" component={() => <ProtectedRoute component={Referral} />} />
+          <Route path="/withdrawal" component={() => <ProtectedRoute component={Withdrawal} />} />
+          <Route path="/withdrawal-popup" component={() => <ProtectedRoute component={WithdrawalPopup} />} />
+          
+          {/* Lazy loaded protected routes */}
+          <Route path="/create-channel" component={() => 
+            <ProtectedRoute component={() => 
+              <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
+                <ChannelCreation />
+              </Suspense>
+            } />
+          } />
+          
+          <Route path="/super-admin" component={() => 
+            <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
+              <SuperAdmin />
+            </Suspense>
+          } />
+          
+          {/* 404 route */}
+          <Route component={NotFound} />
+        </Switch>
+        <Toaster />
       </AuthProvider>
     </QueryClientProvider>
   );
 }
+
+export default App;

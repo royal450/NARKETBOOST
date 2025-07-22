@@ -7,9 +7,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Services Management APIs
   app.get("/api/courses", async (req, res) => {
     try {
-      // Get only active services for dashboard
+      // Get only active, approved, and non-blocked services for dashboard
       const services = await storage.getCourses();
-      const activeServices = services.filter(service => service.status === 'active' && service.approvalStatus === 'approved');
+      const activeServices = services.filter(service => 
+        service.status === 'active' && 
+        service.approvalStatus === 'approved' && 
+        !service.blocked
+      );
       res.json(activeServices);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch services" });
@@ -20,7 +24,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/channels", async (req, res) => {
     try {
       const channels = await storage.getCourses();
-      const activeChannels = channels.filter(channel => channel.status === 'active' && channel.approvalStatus === 'approved');
+      const activeChannels = channels.filter(channel => 
+        channel.status === 'active' && 
+        channel.approvalStatus === 'approved' && 
+        !channel.blocked
+      );
       res.json(activeChannels);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch channels" });
@@ -171,10 +179,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const courseId = req.params.id;
       const updated = await storage.updateCourse(courseId, { 
         soldOut: true,
-        soldOutAt: new Date()
+        soldOutAt: new Date().toISOString()
       });
       res.json(updated);
     } catch (error) {
+      console.error('Sold out error:', error);
       res.status(500).json({ error: "Failed to mark as sold out" });
     }
   });
@@ -189,7 +198,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       res.json(updated);
     } catch (error) {
+      console.error('Remove sold out error:', error);
       res.status(500).json({ error: "Failed to remove sold out badge" });
+    }
+  });
+
+  // Add bonus badge
+  app.put("/api/courses/:id/bonus-badge", async (req, res) => {
+    try {
+      const courseId = req.params.id;
+      const { badgeText, badgeType } = req.body;
+      const updated = await storage.updateCourse(courseId, { 
+        bonusBadge: true,
+        badgeText: badgeText || "🔥 HOT",
+        badgeType: badgeType || "custom",
+        badgeAddedAt: new Date().toISOString()
+      });
+      res.json(updated);
+    } catch (error) {
+      console.error('Bonus badge error:', error);
+      res.status(500).json({ error: "Failed to add bonus badge" });
+    }
+  });
+
+  // Remove bonus badge
+  app.put("/api/courses/:id/remove-bonus-badge", async (req, res) => {
+    try {
+      const courseId = req.params.id;
+      const updated = await storage.updateCourse(courseId, { 
+        bonusBadge: false,
+        badgeText: null,
+        badgeType: null,
+        badgeAddedAt: null
+      });
+      res.json(updated);
+    } catch (error) {
+      console.error('Remove bonus badge error:', error);
+      res.status(500).json({ error: "Failed to remove bonus badge" });
     }
   });
 
