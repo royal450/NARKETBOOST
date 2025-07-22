@@ -84,7 +84,7 @@ const getAutoThumbnail = (category: string, serviceType: string) => {
     'Fashion & Beauty': 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=400',
     'Business & Finance': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
   };
-  
+
   return thumbnailMap[category] || 'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=400';
 };
 
@@ -178,7 +178,7 @@ export default function ChannelCreation() {
         title: "🎉 Channel Submitted Successfully!",
         description: "Your channel is now under review. You'll be notified once it's approved.",
       });
-      
+
       // Reset form
       window.location.reload();
     },
@@ -612,7 +612,7 @@ export default function ChannelCreation() {
                 </div>
               )}
             </Button>
-            
+
             <p className="text-gray-600 mt-4">
               🔒 Your submission will be reviewed within 24 hours
             </p>
