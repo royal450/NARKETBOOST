@@ -77,18 +77,20 @@ export default function SuperAdmin() {
     }
   };
 
-  // Admin actions using Firebase
+  // Admin actions using Firebase - FIXED
   const handleApproveService = async (serviceId: string) => {
     try {
+      console.log('🔥 Admin approving service:', serviceId);
       await adminOperations.approveService(serviceId);
       toast({
-        title: "✅ Service Approved!",
-        description: "Service has been approved and is now live on the platform.",
+        title: "✅ Channel Approved!",
+        description: "Channel is now live and visible on dashboard.",
       });
     } catch (error: any) {
+      console.error('❌ Approval failed:', error);
       toast({
         title: "❌ Approval Failed",
-        description: error?.message || "Failed to approve service",
+        description: error?.message || "Failed to approve channel",
         variant: "destructive",
       });
     }
@@ -112,31 +114,37 @@ export default function SuperAdmin() {
 
   const handleBlockService = async (serviceId: string, blocked: boolean, reason?: string) => {
     try {
+      console.log('🚫 Admin blocking/unblocking service:', serviceId, blocked);
       await adminOperations.blockService(serviceId, blocked, reason);
       toast({
-        title: blocked ? "🚫 Service Blocked" : "✅ Service Unblocked",
-        description: `Service has been ${blocked ? 'blocked' : 'unblocked'} successfully.`,
+        title: blocked ? "🚫 Channel Blocked" : "✅ Channel Unblocked",
+        description: blocked ? `Channel blocked and removed from dashboard` : "Channel is now visible on dashboard",
       });
     } catch (error: any) {
+      console.error('❌ Block/unblock failed:', error);
       toast({
         title: "❌ Action Failed",
-        description: error?.message || `Failed to ${blocked ? 'block' : 'unblock'} service`,
+        description: error?.message || `Failed to ${blocked ? 'block' : 'unblock'} channel`,
         variant: "destructive",
       });
     }
   };
 
   const handleDeleteService = async (serviceId: string) => {
+    if (!confirm("Are you sure you want to permanently delete this channel?")) return;
+    
     try {
+      console.log('🗑️ Admin deleting service:', serviceId);
       await adminOperations.deleteService(serviceId);
       toast({
-        title: "🗑️ Service Deleted",
-        description: "Service has been permanently removed from the platform.",
+        title: "🗑️ Channel Deleted",
+        description: "Channel has been permanently removed from platform.",
       });
     } catch (error: any) {
+      console.error('❌ Delete failed:', error);
       toast({
         title: "❌ Delete Failed",
-        description: error?.message || "Failed to delete service",
+        description: error?.message || "Failed to delete channel",
         variant: "destructive",
       });
     }
@@ -471,6 +479,24 @@ export default function SuperAdmin() {
                           <div>
                             <h3 className="font-semibold text-lg">{channel.title}</h3>
                             <p className="text-gray-600 text-sm">{channel.description}</p>
+                            
+                            {/* Show Category and Monetization */}
+                            <div className="flex items-center gap-2 mt-2 mb-2">
+                              <Badge variant="outline" className="bg-blue-50 text-blue-700">
+                                📱 {channel.category || 'General'}
+                              </Badge>
+                              {channel.monetized && (
+                                <Badge variant="outline" className="bg-green-50 text-green-700">
+                                  💰 Monetized
+                                </Badge>
+                              )}
+                              {channel.seller && (
+                                <Badge variant="outline" className="bg-purple-50 text-purple-700">
+                                  👤 {channel.seller}
+                                </Badge>
+                              )}
+                            </div>
+                            
                             <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
                               <span className="flex items-center gap-1">
                                 <Heart className="w-4 h-4" />

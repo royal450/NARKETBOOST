@@ -20,16 +20,16 @@ export function useFirebaseRealtime() {
             const data = snapshot.val();
             if (data) {
               const servicesArray = Object.entries(data).map(([id, service]: [string, any]) => {
-                // Generate marketing elements with production-ready fake data
+                // Generate marketing elements with correct ranges
                 const marketingElements = {
-                  likes: service.likes || Math.floor(Math.random() * 2000) + 500,
+                  likes: service.likes || Math.floor(Math.random() * 401) + 100, // 100-500 range
                   comments: service.comments || Math.floor(Math.random() * 300) + 50,
                   rating: service.rating || (Math.random() * 1.5 + 3.5).toFixed(1),
                   soldCount: service.soldCount || Math.floor(Math.random() * 5000) + 1000,
                   fakePrice: service.fakePrice || Math.floor(service.price * (3 + Math.random() * 2)),
                   followerCount: service.followerCount || Math.floor(Math.random() * 500000) + 50000,
                   engagementRate: service.engagementRate || (Math.random() * 12 + 3).toFixed(1),
-                  views: service.views || Math.floor(Math.random() * 1000000) + 100000,
+                  views: service.views || Math.floor(Math.random() * 7001) + 2000, // 2000-9000 range
                   createdAt: service.createdAt || new Date().toISOString(),
                   lastUpdated: service.lastUpdated || new Date().toISOString()
                 };
@@ -48,9 +48,10 @@ export function useFirebaseRealtime() {
                   ...service,
                   ...marketingElements
                 };
+              }).filter((service: any) => {
+                // Dashboard shows ONLY approved and non-blocked services
+                return (service.approvalStatus === 'approved' && service.status === 'active' && !service.blocked);
               });
-              // For dashboard, filter only approved and active services
-              // For admin panel, show ALL services regardless of status
               setServices(servicesArray);
             } else {
               setServices([]);

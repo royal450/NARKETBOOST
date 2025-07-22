@@ -40,9 +40,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { user } = await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(user, { displayName });
     
+    // Save user data to Firebase Realtime Database for admin panel
+    await saveUserToDatabase(user, referralCode);
+    
     // Handle referral bonus
     if (referralCode) {
       await processReferralBonus(user.uid, referralCode);
+    }
+  };
+
+  const saveUserToDatabase = async (user: User, referralCode?: string) => {
+    try {
+      const { ref, set, serverTimestamp } = await import('firebase/database');
+      const { database } = await import('@/lib/firebase');
+      
+      // Generate unique referral code for new user
+      const newReferralCode = Math.random().toString(36).substr(2, 9).toUpperCase();
+      
+      const userData = {
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName,
+        photoURL: user.photoURL,
+        referralCode: newReferralCode,
+        usedReferralCode: referralCode || null,
+        walletBalance: 0,
+        totalEarnings: 0,
+        totalReferrals: 0,
+        totalPurchases: 0,
+        isActive: true,
+        createdAt: serverTimestamp(),
+        lastActiveAt: serverTimestamp(),
+        signupDate: new Date().toISOString()
+      };
+      
+      await set(ref(database, `users/${user.uid}`), userData);
+      console.log('✅ User data saved to Firebase:', userData);
+    } catch (error) {
+      console.error('❌ Failed to save user data:', error);
     }
   };
 

@@ -379,6 +379,18 @@ export function ChannelCard({ channel, onBuyNow }: ChannelCardProps) {
               </Badge>
             )}
           </div>
+          {/* Category & Monetization Status */}
+          <div className="flex items-center gap-2 text-xs mb-1">
+            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 px-2 py-0.5">
+              📱 {channelData.category || 'General'}
+            </Badge>
+            {channelData.monetized && (
+              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 px-2 py-0.5">
+                💰 Monetized
+              </Badge>
+            )}
+          </div>
+          
           <div className="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400">
             <User className="w-3 h-3" />
             <span>By: {channelData.seller || 'Unknown'}</span>
