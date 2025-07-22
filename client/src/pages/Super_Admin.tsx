@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useFirebaseServices, useFirebaseUsers, useFirebaseAdminStats } from "@/hooks/use-firebase-realtime";
-import { approveServiceInFirebase, rejectServiceInFirebase, toggleServiceBlock, updateServiceMarketing } from "@/lib/firebase-operations";
+import { adminOperations } from "@/lib/admin-firebase";
 import type { Channel, User, AdminStats } from "@shared/schema";
 
 // Complex admin password
@@ -76,10 +76,10 @@ export default function SuperAdmin() {
     }
   };
 
-  // Admin actions for Firebase
+  // Admin actions using Firebase
   const handleApproveService = async (serviceId: string) => {
     try {
-      await approveServiceInFirebase(serviceId, 'Approved by super admin');
+      await adminOperations.approveService(serviceId);
       toast({
         title: "✅ Service Approved!",
         description: "Service has been approved and is now live on the platform.",
@@ -95,7 +95,7 @@ export default function SuperAdmin() {
 
   const handleRejectService = async (serviceId: string, reason: string) => {
     try {
-      await rejectServiceInFirebase(serviceId, reason, 'Rejected by super admin');
+      await adminOperations.rejectService(serviceId, reason);
       toast({
         title: "❌ Service Rejected",
         description: "Service has been rejected with the provided reason.",
@@ -111,7 +111,7 @@ export default function SuperAdmin() {
 
   const handleBlockService = async (serviceId: string, blocked: boolean, reason?: string) => {
     try {
-      await toggleServiceBlock(serviceId, blocked, reason);
+      await adminOperations.blockService(serviceId, blocked, reason);
       toast({
         title: blocked ? "🚫 Service Blocked" : "✅ Service Unblocked",
         description: `Service has been ${blocked ? 'blocked' : 'unblocked'} successfully.`,
@@ -120,6 +120,22 @@ export default function SuperAdmin() {
       toast({
         title: "❌ Action Failed",
         description: error?.message || `Failed to ${blocked ? 'block' : 'unblock'} service`,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeleteService = async (serviceId: string) => {
+    try {
+      await adminOperations.deleteService(serviceId);
+      toast({
+        title: "🗑️ Service Deleted",
+        description: "Service has been permanently removed from the platform.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "❌ Delete Failed",
+        description: error?.message || "Failed to delete service",
         variant: "destructive",
       });
     }
@@ -150,49 +166,9 @@ export default function SuperAdmin() {
     }
   ]);
 
-  // Channel approval mutation
-  const approveMutation = useMutation({
-    mutationFn: async (channelId: number) => {
-      const response = await fetch(`/api/courses/${channelId}/approve`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' }
-      });
-      if (!response.ok) throw new Error('Failed to approve channel');
-      return response.json();
-    },
-    onSuccess: () => {
-      toast({
-        title: "✅ Channel Approved",
-        description: "Channel is now live on the platform",
-      });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/channels'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/channels/pending'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/courses'] });
-    }
-  });
+  // REMOVED - Using direct Firebase functions instead
 
-  // Channel rejection mutation
-  const rejectMutation = useMutation({
-    mutationFn: async ({ channelId, reason }: { channelId: number; reason: string }) => {
-      const response = await fetch(`/api/courses/${channelId}/reject`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reason })
-      });
-      if (!response.ok) throw new Error('Failed to reject channel');
-      return response.json();
-    },
-    onSuccess: () => {
-      toast({
-        title: "❌ Channel Rejected",
-        description: "Channel has been rejected with reason",
-      });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/channels'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/channels/pending'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/courses'] });
-      setRejectionReason("");
-    }
-  });
+  // REMOVED - Using direct Firebase functions instead
 
   // Channel deletion mutation
   const deleteMutation = useMutation({
