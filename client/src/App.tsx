@@ -11,11 +11,8 @@ import Payment from "@/pages/payment";
 import Profile from "@/pages/profile";
 import Promotion from "@/pages/promotion";
 import AdminPanel from "@/pages/admin";
-import { lazy } from "react";
-const ChannelCreationModern = lazy(() => import("@/pages/channel-creation-modern"));
-const FullFeaturedAdmin = lazy(() => import("@/pages/full-featured-admin"));
-const ChannelShowCard = lazy(() => import("@/pages/channel-show-full-attractive-card"));
-const WithdrawalPopup = lazy(() => import("@/pages/withdrawal-popup"));
+// Import lazy after all regular imports
+import { lazy, Suspense } from "react";
 import CreateCourse from "@/pages/create-course";
 import MyCourses from "@/pages/my-courses";
 import Referral from "@/pages/referral";
@@ -23,6 +20,11 @@ import NotFound from "@/pages/not-found";
 import { useAuth } from "@/hooks/use-auth";
 import { useEffect } from "react";
 import Withdrawal from "@/pages/withdrawal";
+
+// Lazy loaded channel pages
+const ChannelCreationModern = lazy(() => import("@/pages/channel-creation-modern"));
+const FullFeaturedAdmin = lazy(() => import("@/pages/full-featured-admin"));
+const ChannelShowCard = lazy(() => import("@/pages/channel-show-full-attractive-card"));
 
 function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
   const { user, loading } = useAuth();
@@ -226,12 +228,23 @@ export default function App() {
           <ProtectedRoute component={CreateCourse} />
         </Route>
         <Route path="/admin">
-          <FullFeaturedAdmin />
+          <AdminPanel />
+        </Route>
+        <Route path="/admin-new">
+          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
+            <FullFeaturedAdmin />
+          </Suspense>
         </Route>
         <Route path="/channel-creation">
-          <ProtectedRoute component={ChannelCreationModern} />
+          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
+            <ProtectedRoute component={ChannelCreationModern} />
+          </Suspense>
         </Route>
-        <Route path="/channels" component={ChannelShowCard} />
+        <Route path="/channels">
+          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
+            <ChannelShowCard />
+          </Suspense>
+        </Route>
         <Route path="/payment/:channelId">
           <ProtectedRoute component={Payment} />
         </Route>
