@@ -304,7 +304,7 @@ export function ChannelCard({ channel, onBuyNow }: ChannelCardProps) {
     <div className={`${channelData.bonusBadge 
       ? 'bg-gradient-to-br from-yellow-50 via-amber-50/80 to-orange-50/60 border-2 border-yellow-300/60 shadow-2xl shadow-yellow-200/40' 
       : 'bg-gradient-to-br from-white via-purple-50/30 to-cyan-50/30 border border-purple-200/50'} 
-      dark:from-gray-800 dark:via-purple-900/30 dark:to-cyan-900/30 dark:border-purple-700/50 rounded-2xl shadow-xl backdrop-blur-sm hover:shadow-2xl transition-all duration-500 group overflow-hidden relative`}
+      dark:from-gray-800 dark:via-purple-900/30 dark:to-cyan-900/30 dark:border-purple-700/50 rounded-2xl shadow-xl backdrop-blur-sm hover:shadow-2xl transition-all duration-500 group overflow-hidden relative`}>
       {/* Sold Out Overlay */}
       {channelData.soldOut && (
         <div className="absolute inset-0 bg-gradient-to-br from-red-500/95 to-orange-500/95 backdrop-blur-sm z-20 flex items-center justify-center rounded-2xl">
