@@ -10,7 +10,7 @@ import Signup from "@/pages/signup";
 import Payment from "@/pages/payment";
 import Profile from "@/pages/profile";
 import Promotion from "@/pages/promotion";
-import AdminSimple from "@/pages/admin-simple";
+import AdminPanel from "@/pages/admin";
 import CreateCourse from "@/pages/create-course";
 import MyCourses from "@/pages/my-courses";
 import Referral from "@/pages/referral";
@@ -222,7 +222,7 @@ export default function App() {
           <ProtectedRoute component={CreateCourse} />
         </Route>
         <Route path="/admin">
-          <AdminSimple />
+          <AdminPanel />
         </Route>
         <Route path="/payment/:channelId">
           <ProtectedRoute component={Payment} />

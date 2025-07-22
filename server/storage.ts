@@ -82,7 +82,11 @@ export class MemStorage implements IStorage {
         platform: "youtube",
         createdAt: new Date(),
         approvedAt: new Date(),
-        approvedBy: "admin"
+        approvedBy: "admin",
+        rejectedAt: null,
+        rejectedBy: null,
+        blockedAt: null,
+        blockedBy: null
       },
       {
         id: 2,
@@ -110,7 +114,11 @@ export class MemStorage implements IStorage {
         platform: "instagram",
         createdAt: new Date(),
         approvedAt: new Date(),
-        approvedBy: "admin"
+        approvedBy: "admin",
+        rejectedAt: null,
+        rejectedBy: null,
+        blockedAt: null,
+        blockedBy: null
       },
       {
         id: 3,
@@ -138,7 +146,11 @@ export class MemStorage implements IStorage {
         platform: "discord",
         createdAt: new Date(),
         approvedAt: new Date(),
-        approvedBy: "admin"
+        approvedBy: "admin",
+        rejectedAt: null,
+        rejectedBy: null,
+        blockedAt: null,
+        blockedBy: null
       }
     ];
     
@@ -231,7 +243,13 @@ export class MemStorage implements IStorage {
       engagementRate: courseData.engagementRate || 0,
       verificationStatus: "unverified",
       platform: courseData.platform || "youtube",
-      createdAt: new Date()
+      createdAt: new Date(),
+      approvedAt: null,
+      approvedBy: null,
+      rejectedAt: null,
+      rejectedBy: null,
+      blockedAt: null,
+      blockedBy: null
     };
     this.courses.set(id.toString(), course);
     return course;
@@ -309,11 +327,12 @@ export class MemStorage implements IStorage {
     return {
       totalUsers,
       totalCourses,
-      activeCourses,
+      approvedCourses: activeCourses,
       pendingCourses,
-      totalPayments,
-      totalReferrals,
-      totalRevenue: Array.from(this.payments.values()).reduce((sum, p) => sum + p.amount, 0)
+      rejectedCourses: Array.from(this.courses.values()).filter(c => c.status === 'rejected').length,
+      totalSales: totalPayments,
+      totalRevenue: Array.from(this.payments.values()).reduce((sum, p) => sum + p.amount, 0),
+      avgRating: 4.5
     };
   }
 }

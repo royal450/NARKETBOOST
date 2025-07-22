@@ -43,6 +43,12 @@ export const channels = pgTable("channels", {
   verificationStatus: text("verification_status").default("unverified"), // 'verified' | 'unverified' | 'pending'
   platform: text("platform").notNull(), // 'instagram' | 'youtube' | 'facebook' | 'tiktok' | 'twitter' | 'linkedin' | 'telegram'
   createdAt: timestamp("created_at").defaultNow(),
+  approvedAt: timestamp("approved_at"),
+  approvedBy: text("approved_by"),
+  rejectedAt: timestamp("rejected_at"),
+  rejectedBy: text("rejected_by"),
+  blockedAt: timestamp("blocked_at"),
+  blockedBy: text("blocked_by"),
 });
 
 export const payments = pgTable("payments", {
