@@ -481,11 +481,11 @@ export default function Dashboard() {
                 Join thousands of entrepreneurs who've grown their business with premium digital services
               </p>
               <Button
-                onClick={() => setLocation("/referral")}
+                onClick={() => setLocation("/list-channel")}
                 className="bg-white text-purple-600 hover:bg-gray-100 px-8 py-4 rounded-full font-bold text-lg shadow-2xl transform hover:scale-105 transition-all duration-300"
               >
                 <Flame className="w-5 h-5 mr-2" />
-                Start Your Journey
+                List Your Channel
               </Button>
             </CardContent>
           </Card>

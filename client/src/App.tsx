@@ -225,28 +225,39 @@ export default function App() {
           <ProtectedRoute component={Payment} />
         </Route>
         <Route path="/list-channel">
-          <ProtectedRoute component={CreateCourse} />
+          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
+            <ProtectedRoute component={EnhancedChannelSubmission} />
+          </Suspense>
         </Route>
         <Route path="/promotion">
-          <ProtectedRoute component={CreateCourse} />
+          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
+            <ProtectedRoute component={ChannelCreationModern} />
+          </Suspense>
         </Route>
         <Route path="/create-course">
-          <ProtectedRoute component={CreateCourse} />
+          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
+            <ProtectedRoute component={EnhancedChannelSubmission} />
+          </Suspense>
         </Route>
         <Route path="/admin">
           <ProtectedRoute component={AdminPanel} />
         </Route>
         <Route path="/admin-full">
           <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
-            <FullFeaturedAdmin />
+            <ProtectedRoute component={FullFeaturedAdmin} />
           </Suspense>
         </Route>
         <Route path="/admin-panel">
           <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
-            <FullFeaturedAdmin />
+            <ProtectedRoute component={FullFeaturedAdmin} />
           </Suspense>
         </Route>
         <Route path="/channel-creation">
+          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
+            <ProtectedRoute component={ChannelCreationModern} />
+          </Suspense>
+        </Route>
+        <Route path="/create-channel">
           <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
             <ProtectedRoute component={ChannelCreationModern} />
           </Suspense>
