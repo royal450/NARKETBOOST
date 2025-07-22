@@ -243,9 +243,9 @@ export class MemStorage implements IStorage {
       throw new Error("Course not found");
     }
     
-    const updatedCourse = { ...course, ...updates };
-    this.courses.set(courseId, updatedCourse);
-    return updatedCourse;
+    const updated = { ...course, ...updates };
+    this.courses.set(courseId, updated);
+    return updated;
   }
 
   async deleteCourse(courseId: string): Promise<void> {

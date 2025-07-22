@@ -49,7 +49,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { courseId } = req.params;
       const updatedCourse = await storage.updateCourse(courseId, {
         status: 'active',
-        approvedAt: new Date().toISOString(),
+        approvalStatus: 'approved',
+        approvedAt: new Date(),
         approvedBy: 'admin'
       });
       res.json(updatedCourse);
@@ -65,7 +66,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const updatedCourse = await storage.updateCourse(courseId, {
         status: 'rejected',
-        rejectedAt: new Date().toISOString(),
+        approvalStatus: 'rejected',
+        rejectedAt: new Date(),
         rejectedBy: 'admin',
         rejectionReason: reason
       });
