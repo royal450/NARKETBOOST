@@ -310,9 +310,14 @@ export function ChannelCard({ channel, onBuyNow }: ChannelCardProps) {
         {/* Bonus Badge */}
         {channelData.bonusBadge && !channelData.soldOut && (
           <div className="absolute bottom-4 left-4">
-            <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 text-xs font-bold shadow-lg animate-bounce">
-              {channelData.badgeText || "🔥 HOT"}
-            </Badge>
+            <div className="space-y-1">
+              <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 text-xs font-bold shadow-lg animate-bounce">
+                {channelData.badgeText || "🔥 HOT"}
+              </Badge>
+              <div className="text-xs text-white bg-black/50 px-2 py-1 rounded">
+                By: {channelData.badgeAddedBy === 'Admin' || channelData.badgeAddedBy === 'Super Admin' ? 'Admin' : channelData.seller}
+              </div>
+            </div>
           </div>
         )}
 

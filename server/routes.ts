@@ -1,4 +1,3 @@
-
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
@@ -43,7 +42,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         approvalStatus: 'pending',
         createdAt: new Date()
       };
-      
+
       const channel = await storage.createCourse(channelData);
       res.json(channel);
     } catch (error) {
@@ -59,7 +58,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         approvalStatus: 'pending',
         createdAt: new Date()
       };
-      
+
       const service = await storage.createCourse(serviceData);
       res.json(service);
     } catch (error) {
@@ -98,7 +97,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { courseId } = req.params;
       const { reason } = req.body;
-      
+
       const updatedCourse = await storage.updateCourse(courseId, {
         status: 'rejected',
         approvalStatus: 'rejected',
@@ -116,7 +115,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/referrals/track", async (req, res) => {
     try {
       const { referralCode, newUserId } = req.body;
-      
+
       // Find referrer user
       const referrer = await storage.getUserByReferralCode(referralCode);
       if (!referrer) {
@@ -125,7 +124,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Track referral
       await storage.trackReferral(referrer.id, newUserId);
-      
+
       res.json({ success: true, referrer: referrer.id });
     } catch (error) {
       res.status(500).json({ error: "Failed to track referral" });
@@ -135,7 +134,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/referrals/commission", async (req, res) => {
     try {
       const { purchaseAmount, buyerId } = req.body;
-      
+
       // Find who referred this buyer
       const referral = await storage.getReferralByBuyer(buyerId);
       if (!referral) {
@@ -144,12 +143,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Calculate commission (10% of purchase)
       const commission = purchaseAmount * 0.1;
-      
+
       // Update referrer's wallet
       if (referral.referrerId !== null) {
         await storage.updateUserWallet(referral.referrerId, commission);
       }
-      
+
       res.json({ success: true, commission });
     } catch (error) {
       res.status(500).json({ error: "Failed to process commission" });
@@ -275,7 +274,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/payments/verify", async (req, res) => {
     try {
       const { courseId, userId, amount, paymentMethod, transactionId } = req.body;
-      
+
       // Create payment record
       const payment = await storage.createPayment({
         courseId,
@@ -293,23 +292,107 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Admin Stats
+  // Admin endpoints
   app.get("/api/admin/stats", async (req, res) => {
     try {
       const stats = await storage.getAdminStats();
       res.json(stats);
     } catch (error) {
+      console.error("Error fetching admin stats:", error);
       res.status(500).json({ error: "Failed to fetch admin stats" });
     }
   });
 
-  // Admin Users Management
+  app.get("/api/admin/channels", async (req, res) => {
+    try {
+      const channels = await storage.getCourses();
+      console.log("Admin channels found:", channels.length);
+      res.json(channels);
+    } catch (error) {
+      console.error("Error fetching admin channels:", error);
+      res.status(500).json({ error: "Failed to fetch channels" });
+    }
+  });
+
+  app.get("/api/admin/channels/pending", async (req, res) => {
+    try {
+      const allChannels = await storage.getCourses();
+      const pendingChannels = allChannels.filter(
+        (channel) => channel.status === 'pending' || channel.approvalStatus === 'pending'
+      );
+      console.log("Pending channels filtered:", pendingChannels.length);
+      res.json(pendingChannels);
+    } catch (error) {
+      console.error("Error fetching pending channels:", error);
+      res.status(500).json({ error: "Failed to fetch pending channels" });
+    }
+  });
+
   app.get("/api/admin/users", async (req, res) => {
     try {
-      const users = await storage.getUsers();
+      // Get real users from database, not mock data
+      const users = await storage.getRealUsers();
       res.json(users);
     } catch (error) {
+      console.error("Error fetching users:", error);
       res.status(500).json({ error: "Failed to fetch users" });
+    }
+  });
+
+  // Add bonus badge endpoint
+  app.put("/api/courses/:id/bonus-badge", async (req, res) => {
+    try {
+      const courseId = req.params.id;
+      const { badgeText, badgeType, addedBy } = req.body;
+
+      const updates = {
+        bonusBadge: true,
+        badgeType: badgeType || 'admin_special',
+        badgeText: badgeText || '🔥 HOT',
+        badgeAddedAt: new Date().toISOString(),
+        badgeAddedBy: addedBy || 'Admin'
+      };
+
+      const updatedChannel = await storage.updateCourse(courseId, updates);
+      res.json(updatedChannel);
+    } catch (error) {
+      console.error("Error adding bonus badge:", error);
+      res.status(500).json({ error: "Failed to add bonus badge" });
+    }
+  });
+
+  // Remove bonus badge endpoint
+  app.put("/api/courses/:id/remove-bonus-badge", async (req, res) => {
+    try {
+      const courseId = req.params.id;
+
+      const updates = {
+        bonusBadge: false,
+        badgeType: null,
+        badgeText: null,
+        badgeAddedAt: null,
+        badgeAddedBy: null
+      };
+
+      const updatedChannel = await storage.updateCourse(courseId, updates);
+      res.json(updatedChannel);
+    } catch (error) {
+      console.error("Error removing bonus badge:", error);
+      res.status(500).json({ error: "Failed to remove bonus badge" });
+    }
+  });
+
+  // Edit channel endpoint
+  app.put("/api/courses/:id", async (req, res) => {
+    try {
+      const courseId = req.params.id;
+      const updates = req.body;
+
+      const updatedChannel = await storage.updateCourse(courseId, updates);
+      res.json(updatedChannel);
+    } catch (error) {
+      console.error("Error updating channel:", error);
+      res.status(500).json({ error: "Failed to update channel" });
     }
   });
 
@@ -318,7 +401,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { userId } = req.params;
       const { amount, reason } = req.body;
-      
+
       await storage.updateUserWallet(parseInt(userId), amount);
       res.json({ success: true });
     } catch (error) {
@@ -331,7 +414,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { userId } = req.params;
       const { reason } = req.body;
-      
+
       await storage.updateUser(userId, { 
         isActive: false, 
         blockReason: reason,
@@ -380,11 +463,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { status } = req.query;
       let courses = await storage.getCourses();
-      
+
       if (status) {
         courses = courses.filter(course => course.status === status);
       }
-      
+
       res.json(courses);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch admin courses" });
@@ -396,11 +479,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { status } = req.query;
       let courses = await storage.getCourses();
-      
+
       if (status) {
         courses = courses.filter(course => course.status === status);
       }
-      
+
       console.log(`Admin channels found: ${courses.length}`);
       res.json(courses);
     } catch (error) {
@@ -450,7 +533,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { courseId } = req.params;
       const { reason } = req.body;
-      
+
       const updatedCourse = await storage.updateCourse(courseId, {
         blocked: true,
         blockReason: reason,
@@ -466,7 +549,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/courses/:courseId/unblock", async (req, res) => {
     try {
       const { courseId } = req.params;
-      
+
       const updatedCourse = await storage.updateCourse(courseId, {
         blocked: false,
         blockReason: null,

@@ -38,11 +38,11 @@ interface WithdrawalRequest {
 export default function SuperAdmin() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
+
   // Authentication state
   const [password, setPassword] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  
+
   // Dialog states
   const [selectedChannel, setSelectedChannel] = useState<Channel | null>(null);
   const [editingChannel, setEditingChannel] = useState<Channel | null>(null);
@@ -52,7 +52,7 @@ export default function SuperAdmin() {
   const [bonusBadgeText, setBonusBadgeText] = useState("🔥 HOT DEAL");
   const [newThumbnail, setNewThumbnail] = useState("");
   const [withdrawalToProcess, setWithdrawalToProcess] = useState<WithdrawalRequest | null>(null);
-  
+
   // Tab states
   const [activeTab, setActiveTab] = useState("overview");
 
@@ -72,6 +72,23 @@ export default function SuperAdmin() {
         variant: "destructive",
       });
     }
+  };
+
+  // Helper function for API requests
+  const apiRequest = async (url: string, options: RequestInit = {}) => {
+    const response = await fetch(url, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`API request failed: ${response.statusText}`);
+    }
+
+    return response.json();
   };
 
   // Data fetching
@@ -490,20 +507,20 @@ export default function SuperAdmin() {
                             >
                               {channel.approvalStatus || channel.status}
                             </Badge>
-                            
+
                             {/* Show additional status badges */}
                             {channel.soldOut && (
                               <Badge className="bg-red-600 text-white block">
                                 🔴 SOLD OUT
                               </Badge>
                             )}
-                            
+
                             {channel.bonusBadge && (
                               <Badge className="bg-yellow-500 text-white block">
                                 🏆 {channel.badgeText || "FEATURED"}
                               </Badge>
                             )}
-                            
+
                             {channel.blocked && (
                               <Badge className="bg-gray-600 text-white block">
                                 🚫 BLOCKED
@@ -511,7 +528,7 @@ export default function SuperAdmin() {
                             )}
                           </div>
                         </div>
-                        
+
                         <div className="flex flex-wrap gap-2 mt-4">
                           {(channel.status === 'pending' || channel.approvalStatus === 'pending') && (
                             <>
@@ -557,7 +574,7 @@ export default function SuperAdmin() {
                               </Dialog>
                             </>
                           )}
-                          
+
                           <Dialog>
                             <DialogTrigger asChild>
                               <Button size="sm" variant="outline">
@@ -617,7 +634,7 @@ export default function SuperAdmin() {
                               </DialogFooter>
                             </DialogContent>
                           </Dialog>
-                          
+
                           <Button
                             size="sm"
                             variant="outline"
@@ -629,7 +646,7 @@ export default function SuperAdmin() {
                             {channel.blocked ? <Eye className="w-4 h-4 mr-1" /> : <EyeOff className="w-4 h-4 mr-1" />}
                             {channel.blocked ? 'Unblock' : 'Block'}
                           </Button>
-                          
+
                           <Button
                             size="sm"
                             onClick={() => handleSoldOut(channel.id, !channel.soldOut)}
@@ -637,7 +654,7 @@ export default function SuperAdmin() {
                           >
                             {channel.soldOut ? '✅ Remove Sold Out' : '🔴 Mark Sold Out'}
                           </Button>
-                          
+
                           <Dialog>
                             <DialogTrigger asChild>
                               <Button size="sm" className="bg-yellow-500 hover:bg-yellow-600">
@@ -692,7 +709,7 @@ export default function SuperAdmin() {
                               </DialogFooter>
                             </DialogContent>
                           </Dialog>
-                          
+
                           <Button
                             size="sm"
                             variant="destructive"
@@ -701,7 +718,7 @@ export default function SuperAdmin() {
                             <Trash2 className="w-4 h-4 mr-1" />
                             Delete
                           </Button>
-                          
+
                           <Button
                             size="sm"
                             variant="destructive"
@@ -710,7 +727,7 @@ export default function SuperAdmin() {
                             <Trash2 className="w-4 h-4 mr-1" />
                             Delete
                           </Button>
-                          
+
                           <Button 
                             size="sm" 
                             variant="outline"
@@ -732,7 +749,7 @@ export default function SuperAdmin() {
                             <Image className="w-4 h-4 mr-1" />
                             Change Thumbnail
                           </Button>
-                          
+
                           <Button 
                             size="sm" 
                             variant="outline"
@@ -752,7 +769,7 @@ export default function SuperAdmin() {
                             <Award className="w-4 h-4 mr-1" />
                             {channel.soldOut ? 'Remove Sold Out' : 'Mark Sold Out'}
                           </Button>
-                          
+
                           <Button 
                             size="sm" 
                             variant="outline"

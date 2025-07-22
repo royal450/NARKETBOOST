@@ -98,7 +98,8 @@ export class MemStorage implements IStorage {
         bonusBadge: false,
         badgeType: null,
         badgeText: null,
-        badgeAddedAt: null
+        badgeAddedAt: null,
+        badgeAddedBy: null
       },
       {
         id: 2,
@@ -136,7 +137,8 @@ export class MemStorage implements IStorage {
         bonusBadge: false,
         badgeType: null,
         badgeText: null,
-        badgeAddedAt: null
+        badgeAddedAt: null,
+        badgeAddedBy: null
       },
       {
         id: 3,
@@ -174,7 +176,8 @@ export class MemStorage implements IStorage {
         bonusBadge: false,
         badgeType: null,
         badgeText: null,
-        badgeAddedAt: null
+        badgeAddedAt: null,
+        badgeAddedBy: null
       }
     ];
 
@@ -279,7 +282,8 @@ export class MemStorage implements IStorage {
       bonusBadge: false,
       badgeType: null,
       badgeText: null,
-      badgeAddedAt: null
+      badgeAddedAt: null,
+      badgeAddedBy: null
     };
     this.courses.set(id.toString(), course);
     return course;
