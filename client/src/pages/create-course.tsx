@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
-import { ref, set } from "firebase/database";
-import { database } from "@/lib/firebase";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -187,17 +187,9 @@ export default function ListChannel() {
         updatedAt: new Date().toISOString(),
       };
 
-      // Save to Firebase (changed to channels for consistency)
-      await set(ref(database, `channels/${channelId}`), channelData);
-
-      // Update user's listings
-      const userChannelsRef = ref(database, `users/${user.uid}/myChannels/${channelId}`);
-      await set(userChannelsRef, {
-        channelId,
-        title: formData.title,
-        status: "pending_review",
-        createdAt: new Date().toISOString(),
-      });
+      // Save to backend API
+      const response = await apiRequest("POST", "/api/courses", channelData);
+      const result = await response.json();
 
       toast({
         title: "Channel Listed Successfully! 🎉",

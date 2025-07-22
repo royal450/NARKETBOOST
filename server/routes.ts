@@ -109,7 +109,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const commission = purchaseAmount * 0.1;
       
       // Update referrer's wallet
-      await storage.updateUserWallet(referral.referrerId, commission);
+      if (referral.referrerId !== null) {
+        await storage.updateUserWallet(referral.referrerId, commission);
+      }
       
       res.json({ success: true, commission });
     } catch (error) {
@@ -158,6 +160,75 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(activeCourses);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch dashboard courses" });
+    }
+  });
+
+  // Admin course management endpoints
+  app.get("/api/admin/courses", async (req, res) => {
+    try {
+      const { status } = req.query;
+      let courses = await storage.getCourses();
+      
+      if (status) {
+        courses = courses.filter(course => course.status === status);
+      }
+      
+      res.json(courses);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch admin courses" });
+    }
+  });
+
+  app.get("/api/admin/courses/pending", async (req, res) => {
+    try {
+      const courses = await storage.getCourses();
+      const pendingCourses = courses.filter(course => course.status === 'pending' || course.status === 'pending_review');
+      res.json(pendingCourses);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch pending courses" });
+    }
+  });
+
+  app.delete("/api/courses/:courseId", async (req, res) => {
+    try {
+      const { courseId } = req.params;
+      await storage.deleteCourse(courseId);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete course" });
+    }
+  });
+
+  app.put("/api/courses/:courseId/block", async (req, res) => {
+    try {
+      const { courseId } = req.params;
+      const { reason } = req.body;
+      
+      const updatedCourse = await storage.updateCourse(courseId, {
+        blocked: true,
+        blockReason: reason,
+        blockedAt: new Date().toISOString(),
+        blockedBy: 'admin'
+      });
+      res.json(updatedCourse);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to block course" });
+    }
+  });
+
+  app.put("/api/courses/:courseId/unblock", async (req, res) => {
+    try {
+      const { courseId } = req.params;
+      
+      const updatedCourse = await storage.updateCourse(courseId, {
+        blocked: false,
+        blockReason: null,
+        blockedAt: null,
+        blockedBy: null
+      });
+      res.json(updatedCourse);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to unblock course" });
     }
   });
 

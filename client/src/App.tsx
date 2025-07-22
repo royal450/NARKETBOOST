@@ -1,4 +1,6 @@
 import { Switch, Route, useLocation } from "wouter";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "@/lib/queryClient";
 import { AuthProvider } from "@/hooks/use-auth";
 import { Toaster } from "@/components/ui/toaster";
 import Dashboard from "@/pages/dashboard";
@@ -8,7 +10,7 @@ import Signup from "@/pages/signup";
 import Payment from "@/pages/payment";
 import Profile from "@/pages/profile";
 import Promotion from "@/pages/promotion";
-import Admin from "@/pages/admin";
+import AdminSimple from "@/pages/admin-simple";
 import CreateCourse from "@/pages/create-course";
 import MyCourses from "@/pages/my-courses";
 import Referral from "@/pages/referral";
@@ -179,8 +181,9 @@ function ReferralDetector() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <Switch>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <Switch>
         <Route path="/login">
           <PublicRoute component={Login} />
         </Route>
@@ -219,7 +222,7 @@ export default function App() {
           <ProtectedRoute component={CreateCourse} />
         </Route>
         <Route path="/admin">
-          <ProtectedRoute component={Admin} />
+          <AdminSimple />
         </Route>
         <Route path="/payment/:channelId">
           <ProtectedRoute component={Payment} />
@@ -236,6 +239,7 @@ export default function App() {
         <Route component={NotFound} />
       </Switch>
       <Toaster />
-    </AuthProvider>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }
