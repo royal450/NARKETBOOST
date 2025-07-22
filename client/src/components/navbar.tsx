@@ -60,11 +60,20 @@ export function Navbar() {
           <div className="flex items-center space-x-4">
             <Button 
               variant="ghost" 
-              onClick={() => setLocation("/list-channel")}
-              className="text-yellow-600 hover:text-yellow-700 font-medium"
+              onClick={() => setLocation("/channel-creation")}
+              className="text-blue-600 hover:text-blue-700 font-medium"
             >
               <Megaphone className="mr-2 h-4 w-4" />
-              List Channel
+              Submit Channel
+            </Button>
+            
+            <Button 
+              variant="ghost" 
+              onClick={() => setLocation("/super-admin")}
+              className="text-purple-600 hover:text-purple-700 font-medium"
+            >
+              <Settings className="mr-2 h-4 w-4" />
+              Super Admin
             </Button>
             
             <Button variant="ghost" size="icon">

@@ -11,7 +11,7 @@ import Login from "@/pages/login";
 import Signup from "@/pages/signup";
 import Payment from "@/pages/payment";
 import Profile from "@/pages/profile";
-import Promotion from "@/pages/promotion";
+
 import AdminPanel from "@/pages/admin";
 import Referral from "@/pages/referral";
 import NotFound from "@/pages/not-found";
@@ -24,7 +24,8 @@ const ChannelShowCard = lazy(() => import("@/pages/channel-show-full-attractive-
 const EnhancedChannelSubmission = lazy(() => import("@/pages/enhanced-channel-submission"));
 
 // Lazy loaded new pages
-const WithdrawalPopup = lazy(() => import("@/pages/withdrawal-popup"));
+const SuperAdmin = lazy(() => import("@/pages/Super_Admin"));
+const ChannelCreation = lazy(() => import("@/pages/Channel_Creation"));
 
 function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
   const { user, loading } = useAuth();
@@ -237,17 +238,14 @@ export default function App() {
             <ProtectedRoute component={EnhancedChannelSubmission} />
           </Suspense>
         </Route>
-        <Route path="/admin">
-          <ProtectedRoute component={AdminPanel} />
-        </Route>
-        <Route path="/admin-full">
+        <Route path="/super-admin">
           <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
-            <ProtectedRoute component={FullFeaturedAdmin} />
+            <SuperAdmin />
           </Suspense>
         </Route>
-        <Route path="/admin-panel">
+        <Route path="/channel-creation">
           <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
-            <ProtectedRoute component={FullFeaturedAdmin} />
+            <ProtectedRoute component={ChannelCreation} />
           </Suspense>
         </Route>
         <Route path="/channel-creation">
@@ -295,11 +293,7 @@ export default function App() {
         <Route path="/invite/:code" component={ReferralDetector} />
         <Route path="/inviteCode*" component={ReferralDetector} />
         
-        <Route path="/withdrawal-popup">
-          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
-            <ProtectedRoute component={WithdrawalPopup} />
-          </Suspense>
-        </Route>
+
         <Route path="/" component={AutoRedirectRoute} />
         <Route path="/not-found" component={NotFound} />
         <Route path="/withdrawal" component={Withdrawal} />

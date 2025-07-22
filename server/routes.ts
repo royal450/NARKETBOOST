@@ -180,6 +180,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin Users Management
+  app.get("/api/admin/users", async (req, res) => {
+    try {
+      const users = await storage.getUsers();
+      res.json(users);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch users" });
+    }
+  });
+
+  // User bonus system
+  app.post("/api/admin/users/:userId/bonus", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const { amount, reason } = req.body;
+      
+      await storage.updateUserWallet(parseInt(userId), amount);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to give bonus" });
+    }
+  });
+
+  // User blocking system  
+  app.put("/api/admin/users/:userId/block", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const { reason } = req.body;
+      
+      await storage.updateUser(userId, { 
+        isActive: false, 
+        blockReason: reason,
+        blockedAt: new Date().toISOString() 
+      });
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to block user" });
+    }
+  });
+
+  // Withdrawal management
+  app.get("/api/admin/withdrawals", async (req, res) => {
+    try {
+      const withdrawals = await storage.getWithdrawals();
+      res.json(withdrawals);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch withdrawals" });
+    }
+  });
+
+  app.put("/api/admin/withdrawals/:withdrawalId/approve", async (req, res) => {
+    try {
+      const { withdrawalId } = req.params;
+      await storage.updateWithdrawal(withdrawalId, { status: 'approved' });
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to approve withdrawal" });
+    }
+  });
+
   // Dashboard filtering by status
   app.get("/api/dashboard/courses", async (req, res) => {
     try {

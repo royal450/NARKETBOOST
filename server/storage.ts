@@ -10,6 +10,8 @@ export interface IStorage {
   getUserByReferralCode(code: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUserWallet(userId: number, amount: number): Promise<void>;
+  getUsers(): Promise<User[]>;
+  updateUser(userId: string, updates: any): Promise<User>;
   
   // Course/Channel methods
   getCourses(): Promise<Channel[]>;
@@ -24,6 +26,10 @@ export interface IStorage {
   // Referral methods
   trackReferral(referrerId: number, referredId: number): Promise<void>;
   getReferralByBuyer(buyerId: number): Promise<ReferralBonus | undefined>;
+  
+  // Withdrawal methods
+  getWithdrawals(): Promise<any[]>;
+  updateWithdrawal(withdrawalId: string, updates: any): Promise<any>;
   
   // Admin methods
   getAdminStats(): Promise<any>;
@@ -268,6 +274,44 @@ export class MemStorage implements IStorage {
 
   async deleteCourse(courseId: string): Promise<void> {
     this.courses.delete(courseId);
+  }
+
+  // Users management methods
+  async getUsers(): Promise<User[]> {
+    return Array.from(this.users.values());
+  }
+
+  async updateUser(userId: string, updates: any): Promise<User> {
+    const user = this.users.get(parseInt(userId));
+    if (!user) {
+      throw new Error("User not found");
+    }
+    
+    const updated = { ...user, ...updates };
+    this.users.set(parseInt(userId), updated);
+    return updated;
+  }
+
+  // Withdrawal methods
+  async getWithdrawals(): Promise<any[]> {
+    // Mock withdrawal data - in real implementation, this would come from database
+    return [
+      {
+        id: "1",
+        userId: "1",
+        userName: "John Doe",
+        amount: 500,
+        method: "UPI",
+        accountDetails: "john@paytm",
+        status: "pending",
+        createdAt: new Date().toISOString()
+      }
+    ];
+  }
+
+  async updateWithdrawal(withdrawalId: string, updates: any): Promise<any> {
+    // Mock implementation - in real app, this would update database
+    return { success: true, withdrawalId, updates };
   }
 
   // Payment methods
