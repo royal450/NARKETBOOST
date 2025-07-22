@@ -23,7 +23,7 @@ interface Comment {
   id: string;
   user: string;
   text: string;
-  timestamp: Date;
+  timestamp: Date | string;
   avatar: string;
 }
 
@@ -534,7 +534,9 @@ export function ChannelCard({ channel, onBuyNow }: ChannelCardProps) {
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="font-semibold text-sm text-gray-900 dark:text-white">{comment.user}</span>
-                      <span className="text-xs text-gray-500 dark:text-gray-400">{comment.timestamp}</span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        {typeof comment.timestamp === 'string' ? comment.timestamp : formatTimeAgo(comment.timestamp)}
+                      </span>
                     </div>
                     <p className="text-sm text-gray-700 dark:text-gray-300">{comment.text}</p>
                   </div>
